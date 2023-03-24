@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import * as Colyseus from "colyseus.js";
-import WeaponPlugin from 'phaser3-weapon-plugin';
+import WeaponPlugin from "phaser3-weapon-plugin";
 
 export default class HelloWorldScene extends Phaser.Scene {
   private client!: Colyseus.Client;
@@ -11,7 +11,6 @@ export default class HelloWorldScene extends Phaser.Scene {
   private room?: Colyseus.Room;
 
   private weapon!: any;
-
 
   inputPayload = {
     left: false,
@@ -37,16 +36,22 @@ export default class HelloWorldScene extends Phaser.Scene {
       frameWidth: 32,
       frameHeight: 48,
     });
-    
+
     //Loading maps & tilesets for maps
-    this.load.image('retro-tiles', '../assets/tiles/Retro-Lines-Tiles.png');
-    this.load.tilemapTiledJSON('retro-map', '../assets/tiles/Retro-Map-v2.json');
+    this.load.image("retro-tiles", "../assets/tiles/Retro-Lines-Tiles.png");
+    this.load.tilemapTiledJSON(
+      "retro-map",
+      "../assets/tiles/Retro-Map-v2.json"
+    );
 
-    this.load.image('farm-tiles', '../assets/tiles/Farm.png');
-    this.load.tilemapTiledJSON('farm-map', '../assets/tiles/Farm.json');
+    this.load.image("farm-tiles", "../assets/tiles/Farm.png");
+    this.load.tilemapTiledJSON("farm-map", "../assets/tiles/Farm.json");
 
-    this.load.image('mountain-tiles', '../assetc/tiles/MountainRange.png');
-    this.load.tilemapTiledJSON('mountain-map', 'assets/tiles/MountainRange.json')
+    this.load.image("mountain-tiles", "../assets/tiles/MountainRange.png");
+    this.load.tilemapTiledJSON(
+      "mountain-map",
+      "assets/tiles/MountainRange.json"
+    );
   }
 
   async create() {
@@ -62,7 +67,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     platforms.create(50, 250, "ground");
     platforms.create(750, 220, "ground");
 
-    this.room.state.players.onAdd((player: any, sessionId: string) => {
+    this.room.state.players.onAdd = (player: any, sessionId: string) => {
       const entity = this.physics.add.sprite(player.x, player.y, "dude");
       this.physics.add.existing(entity);
       entity.setBounce(0.2);
@@ -70,19 +75,19 @@ export default class HelloWorldScene extends Phaser.Scene {
       this.physics.add.collider(entity, platforms);
       this.playerEntities[sessionId] = entity;
 
-      player.onChange(() => {
+      player.onChange = () => {
         entity.x = player.x;
         entity.y = player.y;
-      });
-    });
+      };
+    };
 
-    this.room.state.players.onRemove((player: any, sessionId: string) => {
+    this.room.state.players.onRemove = (player: any, sessionId: string) => {
       const entity = this.playerEntities[sessionId];
       if (entity) {
         entity.destroy();
         delete this.playerEntities[sessionId];
       }
-    });
+    };
 
     //Weapons in progress
 
@@ -117,9 +122,8 @@ export default class HelloWorldScene extends Phaser.Scene {
       frameRate: 10,
       repeat: -1,
     });
-    
-  
-    this.scene.start('FarmLevel');
+
+    this.scene.start("FarmLevel");
   }
 
   update() {
