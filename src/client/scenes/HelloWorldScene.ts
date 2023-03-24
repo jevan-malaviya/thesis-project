@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import * as Colyseus from "colyseus.js";
+import WeaponPlugin from 'phaser3-weapon-plugin';
 
 export default class HelloWorldScene extends Phaser.Scene {
   private client!: Colyseus.Client;
@@ -8,6 +9,9 @@ export default class HelloWorldScene extends Phaser.Scene {
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private playerEntities: { [sessionId: string]: any } = {};
   private room?: Colyseus.Room;
+
+  private weapon!: any;
+
 
   inputPayload = {
     left: false,
@@ -33,6 +37,16 @@ export default class HelloWorldScene extends Phaser.Scene {
       frameWidth: 32,
       frameHeight: 48,
     });
+    
+    //Loading maps & tilesets for maps
+    this.load.image('retro-tiles', '../assets/tiles/Retro-Lines-Tiles.png');
+    this.load.tilemapTiledJSON('retro-map', '../assets/tiles/Retro-Map-v2.json');
+
+    this.load.image('farm-tiles', '../assets/tiles/Farm.png');
+    this.load.tilemapTiledJSON('farm-map', '../assets/tiles/Farm.json');
+
+    this.load.image('mountain-tiles', '../assetc/tiles/MountainRange.png');
+    this.load.tilemapTiledJSON('mountain-map', 'assets/tiles/MountainRange.json')
   }
 
   async create() {
@@ -70,6 +84,20 @@ export default class HelloWorldScene extends Phaser.Scene {
       }
     });
 
+    //Weapons in progress
+
+    // this.plugins.addScenePlugin('weaponplugin', WeaponPlugin, true);
+    // this.weapon = this.add.weapon(10, 'bullet'); //this has to be replaced with an image of a bullet once working
+
+    // this.weapon.bulletSpeed = 600;
+    // this.weapon.fireRate = 100;
+
+    // this.weapon.trackSprite(this.player, 0, 0, true);
+
+    // this.input.on('pointerdown', () => {
+    //   this.weapon.fire();
+    // })
+
     this.anims.create({
       key: "left",
       frames: this.anims.generateFrameNumbers("dude", { start: 0, end: 3 }),
@@ -89,6 +117,9 @@ export default class HelloWorldScene extends Phaser.Scene {
       frameRate: 10,
       repeat: -1,
     });
+    
+  
+    this.scene.start('FarmLevel');
   }
 
   update() {
