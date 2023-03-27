@@ -1,14 +1,16 @@
-import { ArcadePhysics } from "arcade-physics";
 import { Room, Client } from "colyseus";
-import { MyRoomState } from "./schema/MyRoomState";
-import { InputData, Player } from "./schema/PlayerSchema";
+import { InputData, MyRoomState } from "./schema/MyRoomState";
+import { GameEngine } from "../GameEngine";
+import Matter from "matter-js";
 
 export class MyRoom extends Room<MyRoomState> {
   fixedTimeStep = 1000 / 60;
-  physics: ArcadePhysics = null;
+  engine: GameEngine = null;
 
   onCreate(options: any) {
     this.setState(new MyRoomState());
+
+    this.engine = new GameEngine(this.state);
 
     this.onMessage(0, (client, input) => {
       // handle player input
@@ -18,73 +20,41 @@ export class MyRoom extends Room<MyRoomState> {
       player.inputQueue.push(input);
     });
 
-    const config = {
-      width: 800,
-      height: 600,
-      gravity: {
-        x: 0,
-        y: 300,
-      },
-    };
-
-    const physics = new ArcadePhysics(config);
-
-    const platform1 = physics.add.staticBody(800, 568);
-    const platform2 = physics.add.staticBody(600, 400);
-    const platform3 = physics.add.staticBody(50, 250);
-    const platform4 = physics.add.staticBody(750, 220);
-
+    // Game loop
     let elapsedTime = 0;
     this.setSimulationInterval((deltaTime) => {
       elapsedTime += deltaTime;
 
       while (elapsedTime >= this.fixedTimeStep) {
         elapsedTime -= this.fixedTimeStep;
-        this.fixedTick(this.fixedTimeStep);
+        this.update(this.fixedTimeStep);
       }
     });
   }
 
-  fixedTick(timeStep: number) {
-    const velocity = 2;
-
+  update(deltaTime: number) {
     this.state.players.forEach((player) => {
       let input: InputData;
 
       // dequeue player inputs
       while ((input = player.inputQueue.shift())) {
-        if (input.left) {
-          player.x -= velocity;
-        } else if (input.right) {
-          player.x += velocity;
-        }
-
-        if (input.up) {
-          player.y -= 330;
-        }
+        this.engine.processPlayerAction(player.name, input);
 
         player.tick = input.tick;
       }
     });
+    Matter.Engine.update(this.engine.engine, deltaTime);
   }
 
-  onJoin(client: Client, options: any) {
+  onJoin(client: Client) {
     console.log(client.sessionId, "joined!");
 
-    const mapWidth = 800;
-    const mapHeight = 600;
-
-    const player = new Player();
-
-    player.x = 500;
-    player.y = 300;
-
-    this.state.players.set(client.sessionId, player);
+    this.engine.addPlayer(client.sessionId);
   }
 
-  onLeave(client: Client, consented: boolean) {
+  onLeave(client: Client) {
     console.log(client.sessionId, "left!");
-    this.state.players.delete(client.sessionId);
+    this.engine.removePlayer(client.sessionId);
   }
 
   onDispose() {

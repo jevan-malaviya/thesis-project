@@ -3,10 +3,7 @@ import * as Colyseus from "colyseus.js";
 
 export default class HelloWorldScene extends Phaser.Scene {
   private client!: Colyseus.Client;
-  private player?: Phaser.GameObjects.Sprite &
-    Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-  private currentPlayer?: Phaser.GameObjects.Sprite &
-    Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+  private currentPlayer: any;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private playerEntities: { [sessionId: string]: any } = {};
   private room?: Colyseus.Room;
@@ -18,6 +15,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     left: false,
     right: false,
     up: false,
+    down: false,
     tick: 0,
   };
 
@@ -47,38 +45,48 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   async create() {
+    const matter = this.matter;
     this.room = await this.client.joinOrCreate("my_room");
 
     console.log(this.room.sessionId);
 
     this.add.image(400, 300, "sky");
 
-    const platforms = this.physics.add.staticGroup();
-    platforms.create(400, 568, "ground").setScale(2).refreshBody();
-    platforms.create(600, 400, "ground");
-    platforms.create(50, 250, "ground");
-    platforms.create(750, 220, "ground");
+    // const platforms = this.physics.add.staticGroup();
+    // platforms.create(400, 568, "ground").setScale(2).refreshBody();
+    // platforms.create(600, 400, "ground");
+    // platforms.create(50, 250, "ground");
+    // platforms.create(750, 220, "ground");
+
+    matter.world.add([
+      matter.bodies.rectangle(400, 600, 800, 50, { isStatic: true }),
+    ]);
 
     this.room.state.players.onAdd = (player: any, sessionId: string) => {
-      const entity = this.physics.add.sprite(player.x, player.y, "dude");
-      this.physics.add.existing(entity);
-      entity.setBounce(0.2);
-      entity.setCollideWorldBounds(true);
-      this.physics.add.collider(entity, platforms);
+      const entity = matter.add.sprite(100, 100, "dude", 4, {
+        isStatic: false,
+      });
+      // entity.setBounce(0.2);
+      // entity.setCollideWorldBounds(true);
+      // this.physics.add.collider(entity, platforms);
       this.playerEntities[sessionId] = entity;
+      console.log(this.playerEntities);
+
+      // player.onChange = this.updateChanges(player, entity, true, this.tweens);
 
       if (sessionId === this.room?.sessionId) {
         this.currentPlayer = entity;
 
         this.localRef = this.add.rectangle(0, 0, entity.width, entity.height);
-        this.localRef.setStrokeStyle(1, 0x00ff00);
+        this.localRef.setStrokeStyle(1, 0x00ff00); // green
 
         this.remoteRef = this.add.rectangle(0, 0, entity.width, entity.height);
-        this.remoteRef.setStrokeStyle(1, 0xff0000);
+        this.remoteRef.setStrokeStyle(1, 0xff0000); // red
 
         player.onChange = () => {
           this.remoteRef!.x = player.x;
           this.remoteRef!.y = player.y;
+          // console.log(this.remoteRef);
         };
       } else {
         // listening for server updates
@@ -119,7 +127,57 @@ export default class HelloWorldScene extends Phaser.Scene {
       frameRate: 10,
       repeat: -1,
     });
+
+    // if (this.cursors.left.isDown) {
+    //   this.room.send(0, )
+    // }
   }
+
+  // updateChanges =
+  //   (stateObject: any, worldObject: any, log = false, tweens: any) =>
+  //   (changes: any) => {
+  //     // Default the position x and y to game object current x and y
+  //     let targetX = worldObject.body.position.x;
+  //     let targetY = worldObject.body.position.y;
+
+  //     // Apply state changes
+  //     //@ts-ignore
+  //     changes.forEach(({ field, value }) => {
+  //       switch (field) {
+  //         case "x":
+  //           targetX = value;
+  //           break;
+  //         case "y":
+  //           targetY = value;
+  //           break;
+  //         default:
+  //           break;
+  //       }
+  //     });
+
+  //     // We smooth the position changes using phaser.io tweens.
+  //     // This is very important!!
+  //     // Without this, the game will become very laggy with game object jumps from one point to another.
+  //     // Tried to use matter physics using velocity sync, but it has very poor performance.
+  //     tweens.add({
+  //       targets: worldObject,
+  //       x: targetX,
+  //       y: targetY,
+  //       duration: 200,
+  //       ease: "Power2",
+  //     });
+  //   };
+
+  // update(time: number, delta: number): void {
+  //   for (let sessionId in this.playerEntities) {
+  //     // interpolate all player entities
+  //     const entity = this.playerEntities[sessionId];
+  //     console.log(entity.data);
+  //     const { serverX, serverY } = entity.data.values;
+
+  //     entity.x = Phaser.Math.Linear(entity.x, serverX, 0.2);
+  //     entity.y = Phaser.Math.Linear(entity.y, serverY, 0.2);
+  //   }
 
   update(time: number, delta: number): void {
     // skip loop if not connected yet.
@@ -137,30 +195,41 @@ export default class HelloWorldScene extends Phaser.Scene {
   fixedTick(time: number, delta: number) {
     this.currentTick++;
 
+    // const currentPlayerRemote = this.room.state.players.get(this.room.sessionId);
+    // const ticksBehind = this.currentTick - currentPlayerRemote.tick;
+    // console.log({ ticksBehind });
+
+    const velocity = 2;
     this.inputPayload.left = this.cursors.left.isDown;
     this.inputPayload.right = this.cursors.right.isDown;
-    if (this.cursors.up.isDown && this.player?.body.touching.down) {
-      this.inputPayload.up = this.cursors.up.isDown;
-    }
+    this.inputPayload.up = this.cursors.up.isDown;
+
     this.inputPayload.tick = this.currentTick;
-    this.room!.send(0, this.inputPayload);
+    this.room?.send(0, this.inputPayload);
 
     if (this.inputPayload.left) {
-      this.currentPlayer!.x = -160;
-      this.currentPlayer!.anims.play("left", true);
+      this.currentPlayer.x -= velocity;
     } else if (this.inputPayload.right) {
-      this.currentPlayer!.setVelocityX(160);
-      this.currentPlayer!.anims.play("right", true);
-    } else {
-      this.currentPlayer!.x = 0;
-      this.currentPlayer!.anims.play("turn");
-    }
-    if (this.inputPayload.up && this.currentPlayer!.body.touching.down) {
-      this.currentPlayer!.y = -330;
+      this.currentPlayer.x += velocity;
     }
 
-    this.localRef!.x = this.currentPlayer!.x;
-    this.localRef!.y = this.currentPlayer!.y;
+    if (this.inputPayload.up) {
+      this.currentPlayer.y -= 2;
+    }
+
+    this.localRef!.x = this.currentPlayer.x;
+    this.localRef!.y = this.currentPlayer.y;
+
+    // this.currentPlayer.x = Phaser.Math.Linear(
+    //   this.currentPlayer.x,
+    //   this.remoteRef!.x,
+    //   0.2
+    // );
+    // this.currentPlayer.y = Phaser.Math.Linear(
+    //   this.currentPlayer.y,
+    //   this.remoteRef!.y,
+    //   0.2
+    // );
 
     for (let sessionId in this.playerEntities) {
       // interpolate all player entities
