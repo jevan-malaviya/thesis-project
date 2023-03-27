@@ -207,9 +207,9 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.inputPayload.tick = this.currentTick;
     this.room?.send(0, this.inputPayload);
 
-    if (this.inputPayload.left) {
+    if (this.inputPayload.left && !this.inputPayload.right) {
       this.currentPlayer.x -= velocity;
-    } else if (this.inputPayload.right) {
+    } else if (this.inputPayload.right && !this.inputPayload.left) {
       this.currentPlayer.x += velocity;
     }
 
