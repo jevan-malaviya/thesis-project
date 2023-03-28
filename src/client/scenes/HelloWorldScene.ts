@@ -1,11 +1,13 @@
 import Phaser from "phaser";
 import * as Colyseus from "colyseus.js";
 // import WeaponPlugin from 'phaser3-weapon-plugin';
+type PlayerSprite = Phaser.GameObjects.Sprite &
+  Phaser.Types.Physics.Arcade.SpriteWithDynamicBody &
+  { body: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody['body']; weapon: Phaser.Physics.Arcade.Group };
 
 export default class HelloWorldScene extends Phaser.Scene {
   private client!: Colyseus.Client;
-  private player?: Phaser.GameObjects.Sprite &
-    Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+  private player?: PlayerSprite;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private playerEntities: { [sessionId: string]: any } = {};
   private room?: Colyseus.Room;
@@ -36,8 +38,7 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   //   weapon.children.iterate((bullet: Phaser.GameObjects.Image) => {
   //     bullet.setScale(0.5); // Adjust the scale of bullet
-  //   });
-
+  //   }); 
   //   player.weapon = weapon;
 
   init() {
@@ -73,7 +74,7 @@ export default class HelloWorldScene extends Phaser.Scene {
   }
 
   //Fix
-    fireBullet(player: Phaser.GameObjects.Sprite & Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
+    fireBullet(player: PlayerSprite) {
     const bullet = player.weapon.get(player.x, player.y);
     if (bullet) {
       bullet.setActive(true);
