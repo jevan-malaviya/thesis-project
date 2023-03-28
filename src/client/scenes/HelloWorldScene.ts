@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import * as Colyseus from "colyseus.js";
-import WeaponPlugin from "phaser3-weapon-plugin";
+// import WeaponPlugin from 'phaser3-weapon-plugin';
 
 export default class HelloWorldScene extends Phaser.Scene {
   private client!: Colyseus.Client;
@@ -12,6 +12,7 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   private weapon!: any;
 
+
   inputPayload = {
     left: false,
     right: false,
@@ -21,6 +22,23 @@ export default class HelloWorldScene extends Phaser.Scene {
   constructor() {
     super("hello-world");
   }
+
+  //Fix
+  // createWeapon(player: Phaser.GameObjects.Sprite & Phaser.Types.Physics.Arcade.SpriteWithDynamicBody){
+  //   const weapon = this.physics.add.group({
+  //     classType: Phaser.GameObjects.Image,
+  //     key: 'bullet',
+  //     active: false,
+  //     visible: false,
+  //     maxSize: 10,
+  //     defaultKey: 'bullet',
+  //   });
+
+  //   weapon.children.iterate((bullet: Phaser.GameObjects.Image) => {
+  //     bullet.setScale(0.5); // Adjust the scale of bullet
+  //   });
+
+  //   player.weapon = weapon;
 
   init() {
     this.client = new Colyseus.Client("ws://localhost:2567");
@@ -54,12 +72,28 @@ export default class HelloWorldScene extends Phaser.Scene {
     );
   }
 
+  //Fix
+    fireBullet(player: Phaser.GameObjects.Sprite & Phaser.Types.Physics.Arcade.SpriteWithDynamicBody) {
+    const bullet = player.weapon.get(player.x, player.y);
+    if (bullet) {
+      bullet.setActive(true);
+      bullet.setVisible(true);
+      this.physics.moveTo(bullet, this.input.x + this.cameras.main.scrollX, this.input.y + this.cameras.main.scrollY, 600); // 600 is the bullet speed
+      this.physics.add.collider(bullet, platforms, () => {
+        bullet.setActive(false);
+        bullet.setVisible(false);
+        bullet.setPosition(-100, -100);
+      });
+    }
+  }
+
   async create() {
     this.room = await this.client.joinOrCreate("my_room");
 
     console.log(this.room.sessionId);
 
     this.add.image(400, 300, "sky");
+
 
     const platforms = this.physics.add.staticGroup();
     platforms.create(400, 568, "ground").setScale(2).refreshBody();
@@ -75,11 +109,11 @@ export default class HelloWorldScene extends Phaser.Scene {
       this.physics.add.collider(entity, platforms);
       this.playerEntities[sessionId] = entity;
 
-      player.onChange = () => {
+      player.onChange(() => {
         entity.x = player.x;
         entity.y = player.y;
-      };
-    };
+      });
+    });
 
     this.room.state.players.onRemove = (player: any, sessionId: string) => {
       const entity = this.playerEntities[sessionId];
@@ -123,8 +157,10 @@ export default class HelloWorldScene extends Phaser.Scene {
       repeat: -1,
     });
 
-    this.scene.start("FarmLevel");
+
+    this.scene.start('FarmLevel');
   }
+
 
   update() {
     if (!this.room) return;
@@ -135,6 +171,10 @@ export default class HelloWorldScene extends Phaser.Scene {
       this.inputPayload.up = this.cursors.up.isDown;
     }
     this.room.send(0, this.inputPayload);
+
+    if (this.player) {
+      this.player.weaponKey = this.registry.get("selectedWeapon");
+    }
 
     if (this.cursors.left.isDown) {
       this.player?.setVelocityX(-160);
@@ -148,6 +188,19 @@ export default class HelloWorldScene extends Phaser.Scene {
     }
     if (this.cursors.up.isDown && this.player?.body.touching.down) {
       this.player.setVelocityY(-330);
+    }
+
+    //Fix
+    if (this.player) {
+      this.player.weapon.children.iterate((bullet: Phaser.GameObjects.Image) => {
+        if (bullet.active) {
+          if (bullet.x < 0 || bullet.x > this.physics.world.bounds.width || bullet.y < 0 || bullet.y > this.physics.world.bounds.height) {
+            bullet.setActive(false);
+            bullet.setVisible(false);
+            bullet.setPosition(-100, -100);
+          }
+        }
+      });
     }
   }
 }
