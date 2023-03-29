@@ -100,13 +100,13 @@ export class GameEngine {
     let newY = currentPosition.y;
     // Modify position based on data received from clients.
     if (data.left) {
-      newX -= 2;
+      newX -= 4;
     }
     if (data.right) {
-      newX += 2;
+      newX += 4;
     }
     if (data.up) {
-      newY -= 2;
+      newY -= 10;
     }
 
     // Update in the world

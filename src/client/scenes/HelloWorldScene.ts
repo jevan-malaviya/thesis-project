@@ -37,22 +37,6 @@ export default class HelloWorldScene extends Phaser.Scene {
     super("hello-world");
   }
 
-  //Fix
-  // createWeapon(player: Phaser.GameObjects.Sprite & Phaser.Types.Physics.Arcade.SpriteWithDynamicBody){
-  //   const weapon = this.physics.add.group({
-  //     classType: Phaser.GameObjects.Image,
-  //     key: 'bullet',
-  //     active: false,
-  //     visible: false,
-  //     maxSize: 10,
-  //     defaultKey: 'bullet',
-  //   });
-
-  //   weapon.children.iterate((bullet: Phaser.GameObjects.Image) => {
-  //     bullet.setScale(0.5); // Adjust the scale of bullet
-  //   });
-  //   player.weapon = weapon;
-
   init() {
     this.client = new Colyseus.Client("ws://localhost:2567");
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -108,12 +92,6 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     this.add.image(400, 300, "sky");
 
-    // const platforms = this.physics.add.staticGroup();
-    // platforms.create(400, 568, "ground").setScale(2).refreshBody();
-    // platforms.create(600, 400, "ground");
-    // platforms.create(50, 250, "ground");
-    // platforms.create(750, 220, "ground");
-
     matter.world.add([
       matter.bodies.rectangle(400, 600, 800, 50, { isStatic: true }),
     ]);
@@ -122,13 +100,9 @@ export default class HelloWorldScene extends Phaser.Scene {
       const entity = matter.add.sprite(100, 100, "dude", 4, {
         isStatic: false,
       });
-      // entity.setBounce(0.2);
-      // entity.setCollideWorldBounds(true);
-      // this.physics.add.collider(entity, platforms);
+
       this.playerEntities[sessionId] = entity;
       console.log(this.playerEntities);
-
-      // player.onChange = this.updateChanges(player, entity, true, this.tweens);
 
       if (sessionId === this.room?.sessionId) {
         this.currentPlayer = entity;
@@ -142,7 +116,6 @@ export default class HelloWorldScene extends Phaser.Scene {
         player.onChange = () => {
           this.remoteRef!.x = player.x;
           this.remoteRef!.y = player.y;
-          // console.log(this.remoteRef);
         };
       } else {
         // listening for server updates
@@ -197,57 +170,7 @@ export default class HelloWorldScene extends Phaser.Scene {
       frameRate: 10,
       repeat: -1,
     });
-
-    // if (this.cursors.left.isDown) {
-    //   this.room.send(0, )
-    // }
   }
-
-  // updateChanges =
-  //   (stateObject: any, worldObject: any, log = false, tweens: any) =>
-  //   (changes: any) => {
-  //     // Default the position x and y to game object current x and y
-  //     let targetX = worldObject.body.position.x;
-  //     let targetY = worldObject.body.position.y;
-
-  //     // Apply state changes
-  //     //@ts-ignore
-  //     changes.forEach(({ field, value }) => {
-  //       switch (field) {
-  //         case "x":
-  //           targetX = value;
-  //           break;
-  //         case "y":
-  //           targetY = value;
-  //           break;
-  //         default:
-  //           break;
-  //       }
-  //     });
-
-  //     // We smooth the position changes using phaser.io tweens.
-  //     // This is very important!!
-  //     // Without this, the game will become very laggy with game object jumps from one point to another.
-  //     // Tried to use matter physics using velocity sync, but it has very poor performance.
-  //     tweens.add({
-  //       targets: worldObject,
-  //       x: targetX,
-  //       y: targetY,
-  //       duration: 200,
-  //       ease: "Power2",
-  //     });
-  //   };
-
-  // update(time: number, delta: number): void {
-  //   for (let sessionId in this.playerEntities) {
-  //     // interpolate all player entities
-  //     const entity = this.playerEntities[sessionId];
-  //     console.log(entity.data);
-  //     const { serverX, serverY } = entity.data.values;
-
-  //     entity.x = Phaser.Math.Linear(entity.x, serverX, 0.2);
-  //     entity.y = Phaser.Math.Linear(entity.y, serverY, 0.2);
-  //   }
 
   update(time: number, delta: number): void {
     // skip loop if not connected yet.
@@ -265,42 +188,30 @@ export default class HelloWorldScene extends Phaser.Scene {
   fixedTick(time: number, delta: number) {
     this.currentTick++;
 
-    // const currentPlayerRemote = this.room.state.players.get(this.room.sessionId);
-    // const ticksBehind = this.currentTick - currentPlayerRemote.tick;
-    // console.log({ ticksBehind });
-
-    const velocity = 2;
+    const velocity = 4;
     this.inputPayload.left = this.cursors.left.isDown;
     this.inputPayload.right = this.cursors.right.isDown;
     this.inputPayload.up = this.cursors.up.isDown;
 
     this.inputPayload.tick = this.currentTick;
-    this.room?.send(0, this.inputPayload);
 
     if (this.inputPayload.left && !this.inputPayload.right) {
       this.currentPlayer.x -= velocity;
+      this.currentPlayer.anims.play("left", true);
     } else if (this.inputPayload.right && !this.inputPayload.left) {
       this.currentPlayer.x += velocity;
+      this.currentPlayer.anims.play("right", true);
+    } else {
+      this.currentPlayer.anims.play("turn");
     }
     this.room?.send(0, this.inputPayload);
 
     if (this.inputPayload.up) {
-      this.currentPlayer.y -= 2;
+      this.currentPlayer.y -= 10;
     }
 
     this.localRef!.x = this.currentPlayer.x;
     this.localRef!.y = this.currentPlayer.y;
-
-    // this.currentPlayer.x = Phaser.Math.Linear(
-    //   this.currentPlayer.x,
-    //   this.remoteRef!.x,
-    //   0.2
-    // );
-    // this.currentPlayer.y = Phaser.Math.Linear(
-    //   this.currentPlayer.y,
-    //   this.remoteRef!.y,
-    //   0.2
-    // );
 
     for (let sessionId in this.playerEntities) {
       // interpolate all player entities
@@ -319,27 +230,8 @@ export default class HelloWorldScene extends Phaser.Scene {
     //Fix
     if (this.player) {
       this.player.weapon.children.iterate(
-        (bullet: Phaser.GameObjects.Image) => {
-          if (bullet.active) {
-            if (
-              bullet.x < 0 ||
-              bullet.x > this.physics.world.bounds.width ||
-              bullet.y < 0 ||
-              bullet.y > this.physics.world.bounds.height
-            ) {
-              bullet.setActive(false);
-              bullet.setVisible(false);
-              bullet.setPosition(-100, -100);
-            }
-          }
-        }
-      );
-    }
-
-    //Fix
-    if (this.player) {
-      this.player.weapon.children.iterate(
-        (bullet: Phaser.GameObjects.Image) => {
+        //@ts-ignore
+        (bullet: Phaser.Physics.Arcade.Image) => {
           if (bullet.active) {
             if (
               bullet.x < 0 ||
