@@ -30,6 +30,7 @@
 		"cors": "^2.8.5",
 		"express": "^4.16.4",
 		"phaser": "^3.55.2",
+		"phaser3-weapon-plugin": "^2.2.0",
 		"serve-index": "^1.8.0",
 		"superagent": "^3.8.1"
 	}
