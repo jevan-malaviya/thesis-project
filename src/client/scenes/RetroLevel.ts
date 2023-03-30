@@ -8,6 +8,9 @@ export default class RetroLevel extends Phaser.Scene {
 
     preload() {
 
+        this.load.image('retro-tiles', '../assets/tiles/Retro-Lines-Tiles.png');
+        this.load.tilemapTiledJSON('retro-map', '../assets/tiles/Retro-Map-v2.json');
+
     }
 
     create() {

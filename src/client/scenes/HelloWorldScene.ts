@@ -58,6 +58,8 @@ export default class HelloWorldScene extends Phaser.Scene {
       frameHeight: 48,
     });
 
+    this.load.image('button', '../assets/next-level.png');
+
     //Dog 1
     this.load.spritesheet('dog1-idle', '../assets/dog1/Idle.png', {
       frameWidth: 64,
@@ -286,6 +288,11 @@ this.anims.create({
       frameRate: 10,
       repeat: -1,
     });
+
+    const button = this.add.image(100, 100, 'button').setInteractive();
+    button.on('pointerdown', () => {
+      this.scene.start('FarmLevel')
+    })
   }
 
   update(time: number, delta: number): void {
