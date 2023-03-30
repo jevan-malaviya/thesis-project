@@ -787,6 +787,19 @@
          "tilecount":1680,
          "tileheight":8,
          "tilewidth":16
+        }, 
+        {
+         "columns":20,
+         "firstgid":3121,
+         "image":"..\/..\/..\/..\/..\/..\/Downloads\/Retro-Lines-Tiles.png",
+         "imageheight":672,
+         "imagewidth":320,
+         "margin":0,
+         "name":"Retro mini",
+         "spacing":0,
+         "tilecount":1680,
+         "tileheight":8,
+         "tilewidth":16
         }],
  "tilewidth":16,
  "type":"map",

@@ -19,7 +19,7 @@ const config: Phaser.Types.Core.GameConfig = {
       gravity: { y: 1 },
     },
   },
-  scene: [FarmLevel],
+  scene: [RetroLevel],
   plugins: {
     scene: [
       { key: 'WeaponPlugin', plugin: WeaponPlugin, mapping: 'weapons' } 

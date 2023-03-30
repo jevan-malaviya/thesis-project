@@ -69,6 +69,10 @@ export default class HelloWorldScene extends Phaser.Scene {
       frameWidth: 64,
       frameHeight: 64,
     });
+    this.load.spritesheet('dog1-walk-left', '../assets/dog2/Walk-Left.png', {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
     this.load.spritesheet('dog1-attack', '../assets/dog1/Attack.png', {
       frameWidth: 64,
       frameHeight: 64,
@@ -88,6 +92,10 @@ export default class HelloWorldScene extends Phaser.Scene {
       frameHeight: 64,
     });
     this.load.spritesheet('dog2-walk', '../assets/dog2/Walk.png', {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
+    this.load.spritesheet('dog2-walk-left', '../assets/dog2/Walk-Left.png', {
       frameWidth: 64,
       frameHeight: 64,
     });
@@ -114,10 +122,10 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.load.image("farm-tiles", "../assets/tiles/Farm.png");
     this.load.tilemapTiledJSON("farm-map", "../assets/tiles/Farm.json");
 
-    this.load.image("mountain-tiles", "../assets/tiles/MountainRange.png");
+    this.load.image("cliff-tiles", "../assets/tiles/Cliffs.png");
     this.load.tilemapTiledJSON(
-      "mountain-map",
-      "assets/tiles/MountainRange.json"
+      "cliff-map",
+      "assets/tiles/Cliffs.json"
     );
 
     this.load.image('bullet', '../assets/bullet.png');
@@ -307,9 +315,9 @@ this.anims.create({
       this.fixedTick(time, this.fixedTimeStep);
     }
 
-    if (this.fireKey.isDown) {
-      this.fireBullet(this.player as PlayerSprite);
-    }
+    // if (this.fireKey.isDown) {
+    //   this.fireBullet(this.player as PlayerSprite);
+    // }
   }
 
   fixedTick(time: number, delta: number) {
@@ -333,9 +341,9 @@ this.anims.create({
     }
     this.room?.send(0, this.inputPayload);
 
-    if (this.spacebar.isDown) {
-      this.fireBullet(this.currentPlayer);
-    }
+    // if (this.spacebar.isDown) {
+    //   this.fireBullet(this.currentPlayer);
+    // }
 
     if (this.inputPayload.up) {
       this.currentPlayer.y -= 10;

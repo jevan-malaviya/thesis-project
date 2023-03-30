@@ -1,6 +1,7 @@
-import Phaser from "phaser";
 
-export default class RetroLevel extends Phaser.Scene {
+import HelloWorldScene from "./HelloWorldScene";
+
+export default class RetroLevel extends HelloWorldScene {
 
     constructor() {
         super('RetroLevel')
@@ -13,15 +14,22 @@ export default class RetroLevel extends Phaser.Scene {
 
     }
 
-    create() {
+    async create() {
     
     const retroMap = this.make.tilemap({ key: 'retro-map' });
     const retroTileset = retroMap.addTilesetImage('Retro', 'retro-tiles');
 
-    retroMap.createLayer('Floors', retroTileset );
-    const colliders = retroMap.createLayer('Fence', retroTileset);
+    const landscapeLayer = retroMap.createLayer('Plants', retroTileset );
+    const colliders = retroMap.createLayer('Floors', retroTileset);
 
-    colliders.setCollisionByProperty({Collides: true})
+    colliders.setCollisionByProperty({Collides: true});
+
+    const scaleX = this.scale.width / retroMap.widthInPixels;
+    const scaleY = this.scale.height / retroMap.heightInPixels;
+    const scale = Math.min(scaleX, scaleY);
+
+    landscapeLayer.setScale(scale);
+    colliders.setScale(scale);
     
     }
 }

@@ -34,5 +34,13 @@ export default class StarterMenu extends Phaser.Scene {
         controlsButton.on('pointerdown', ()=> {
             this.scene.start('controls');
         });
+
+        const levelSelectButton = this.add.text(400, 400, 'Level Select', { fontSize: '32px', color: '#FFFFFF'});
+        levelSelectButton.setOrigin(0.5);
+        levelSelectButton.setInteractive();
+
+        levelSelectButton.on('pointerdown', ()=> {
+            this.scene.start('level-select');
+        });
     };
 }
