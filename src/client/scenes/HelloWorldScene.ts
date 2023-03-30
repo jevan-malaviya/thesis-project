@@ -5,6 +5,7 @@ type PlayerSprite = Phaser.GameObjects.Sprite &
   Phaser.Types.Physics.Arcade.SpriteWithDynamicBody & {
     body: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody["body"];
     weapon: Phaser.Physics.Arcade.Group;
+    health: number;
   };
 
 export default class HelloWorldScene extends Phaser.Scene {
@@ -15,7 +16,9 @@ export default class HelloWorldScene extends Phaser.Scene {
   private playerEntities: { [sessionId: string]: any } = {};
   private room?: Colyseus.Room;
 
-  private weapon!: any;
+  private bullets!: Phaser.Physics.Arcade.Group;
+  private fireKey!: Phaser.Input.Keyboard.Key;
+  private spacebar!: Phaser.Input.Keyboard.Key;
 
   localRef?: Phaser.GameObjects.Rectangle;
   remoteRef?: Phaser.GameObjects.Rectangle;
@@ -33,13 +36,16 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   currentTick: number = 0;
 
-  constructor() {
-    super("hello-world");
+  constructor(sceneKey: string = 'hello-world') {
+    super(sceneKey);
   }
 
   init() {
     this.client = new Colyseus.Client("ws://localhost:2567");
     this.cursors = this.input.keyboard.createCursorKeys();
+    this.fireKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    this.spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
   }
 
   preload() {
@@ -111,22 +117,24 @@ export default class HelloWorldScene extends Phaser.Scene {
       "mountain-map",
       "assets/tiles/MountainRange.json"
     );
+
+    this.load.image('bullet', '../assets/bullet.png');
   }
 
   //Fix
-  //   fireBullet(player: PlayerSprite) {
-  //   const bullet = player.weapon.get(player.x, player.y);
-  //   if (bullet) {
-  //     bullet.setActive(true);
-  //     bullet.setVisible(true);
-  //     this.physics.moveTo(bullet, this.input.x + this.cameras.main.scrollX, this.input.y + this.cameras.main.scrollY, 600); // 600 is the bullet speed
-  //     this.physics.add.collider(bullet, platforms, () => {
-  //       bullet.setActive(false);
-  //       bullet.setVisible(false);
-  //       bullet.setPosition(-100, -100);
-  //     });
-  //   }
-  // }
+  fireBullet(player: PlayerSprite) {
+    const bullet = player.weapon.get(player.x, player.y);
+    if (bullet) {
+      bullet.setActive(true);
+      bullet.setVisible(true);
+      this.physics.moveTo(bullet, this.input.x + this.cameras.main.scrollX, this.input.y + this.cameras.main.scrollY, 600); // 600 is the bullet speed
+      this.physics.add.collider(bullet, this.platforms, () => {
+        bullet.setActive(false);
+        bullet.setVisible(false);
+        bullet.setPosition(-100, -100);
+      });
+    }
+  }
 
   async create() {
     const matter = this.matter;
@@ -136,12 +144,82 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     this.add.image(400, 300, "sky");
 
+    //Dog-1 Movements
+    this.anims.create({
+      key: 'dog1-idle',
+      frames: this.anims.generateFrameNumbers('dog1-idle', {start: 0, end: 3}),
+      frameRate: 10,
+      repeat: -1
+  });
+
+    this.anims.create({
+      key: 'dog-1walk',
+      frames: this.anims.generateFrameNumbers('dog1-walk', {start: 0, end: 5}),
+      frameRate: 10,
+      repeat: -1
+  });
+
+  this.anims.create({
+    key: 'dog1-attack',
+    frames: this.anims.generateFrameNumbers('dog1-attack', {start: 0, end: 3}),
+    frameRate: 10,
+    repeat: -1
+  });
+
+  this.anims.create({
+    key: 'dog1-hurt',
+    frames: this.anims.generateFrameNumbers('dog1-hurt', {start: 0, end: 1}),
+    frameRate: 10,
+  });
+
+  this.anims.create({
+    key: 'dog1-ko',
+    frames: this.anims.generateFrameNumbers('dog1-ko', {start: 0, end: 3}),
+    frameRate: 10,
+  });
+
+  //Dog-2 Movements
+  this.anims.create({
+    key: 'dog2-idle',
+    frames: this.anims.generateFrameNumbers('dog2-idle', {start: 0, end: 3}),
+    frameRate: 10,
+    repeat: -1
+});
+
+  this.anims.create({
+    key: 'dog2-walk',
+    frames: this.anims.generateFrameNumbers('dog2-walk', {start: 0, end: 5}),
+    frameRate: 10,
+    repeat: -1
+});
+
+this.anims.create({
+  key: 'dog2-attack',
+  frames: this.anims.generateFrameNumbers('dog2-attack', {start: 0, end: 3}),
+  frameRate: 10,
+  repeat: -1
+});
+
+this.anims.create({
+  key: 'dog2-hurt',
+  frames: this.anims.generateFrameNumbers('dog2-hurt', {start: 0, end: 1}),
+  frameRate: 10,
+});
+
+this.anims.create({
+  key: 'dog2-ko',
+  frames: this.anims.generateFrameNumbers('dog2-ko', {start: 0, end: 3}),
+  frameRate: 10,
+});
+
+
+
     matter.world.add([
       matter.bodies.rectangle(400, 600, 800, 50, { isStatic: true }),
     ]);
 
     this.room.state.players.onAdd = (player: any, sessionId: string) => {
-      const entity = matter.add.sprite(100, 100, "dude", 4, {
+      const entity = matter.add.sprite(100, 100, "dude", 5, {
         isStatic: false,
       });
 
@@ -183,17 +261,11 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     //Weapons in progress
 
-    // this.plugins.addScenePlugin('weaponplugin', WeaponPlugin, true);
-    // this.weapon = this.add.weapon(10, 'bullet'); //this has to be replaced with an image of a bullet once working
-
-    // this.weapon.bulletSpeed = 600;
-    // this.weapon.fireRate = 100;
-
-    // this.weapon.trackSprite(this.player, 0, 0, true);
-
-    // this.input.on('pointerdown', () => {
-    //   this.weapon.fire();
-    // })
+    this.bullets = this.physics.add.group({
+      defaultKey: 'bullet',
+      maxSize: 10,
+      collideWorldBounds: false,
+    })
 
     this.anims.create({
       key: "left",
@@ -227,6 +299,10 @@ export default class HelloWorldScene extends Phaser.Scene {
       this.elapsedTime -= this.fixedTimeStep;
       this.fixedTick(time, this.fixedTimeStep);
     }
+
+    if (this.fireKey.isDown) {
+      this.fireBullet(this.player as PlayerSprite);
+    }
   }
 
   fixedTick(time: number, delta: number) {
@@ -249,6 +325,10 @@ export default class HelloWorldScene extends Phaser.Scene {
       this.currentPlayer.anims.play("turn");
     }
     this.room?.send(0, this.inputPayload);
+
+    if (this.spacebar.isDown) {
+      this.fireBullet(this.currentPlayer);
+    }
 
     if (this.inputPayload.up) {
       this.currentPlayer.y -= 10;

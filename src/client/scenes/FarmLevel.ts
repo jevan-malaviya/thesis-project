@@ -1,6 +1,6 @@
-import Phaser from "phaser";
+import HelloWorldScene from "./HelloWorldScene";
 
-export default class FarmLevel extends Phaser.Scene {
+export default class FarmLevel extends HelloWorldScene {
 
     constructor() {
         super('FarmLevel')
@@ -10,7 +10,7 @@ export default class FarmLevel extends Phaser.Scene {
 
     }
 
-    create() {
+    async create() {
     
     const farmMap = this.make.tilemap({ key: 'farm-map' });
     const farmTileset = farmMap.addTilesetImage('Farm', 'farm-tiles');
