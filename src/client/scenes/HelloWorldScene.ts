@@ -37,16 +37,19 @@ export default class HelloWorldScene extends Phaser.Scene {
 
   currentTick: number = 0;
 
-  constructor(sceneKey: string = 'hello-world') {
+  constructor(sceneKey: string = "hello-world") {
     super(sceneKey);
   }
 
   init() {
     this.client = new Colyseus.Client("ws://localhost:2567");
     this.cursors = this.input.keyboard.createCursorKeys();
-    this.fireKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-    this.spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-
+    this.fireKey = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.SPACE
+    );
+    this.spacebar = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.SPACE
+    );
   }
 
   preload() {
@@ -61,58 +64,58 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     this.load.audio('backgroundMusic', '../assets/track1.mp3');
 
-    this.load.image('button', '../assets/next-level.png');
+    this.load.image("button", "../assets/next-level.png");
 
     //Dog 1
-    this.load.spritesheet('dog1-idle', '../assets/dog1/Idle.png', {
-      frameWidth: 64,
-      frameHeight: 64,
+    this.load.spritesheet("dog1-idle", "../assets/dog1/Idle.png", {
+      frameWidth: 48,
+      frameHeight: 48,
     });
-    this.load.spritesheet('dog1-walk', '../assets/dog1/Walk.png', {
-      frameWidth: 64,
-      frameHeight: 64,
+    this.load.spritesheet("dog1-walk", "../assets/dog1/Walk.png", {
+      frameWidth: 48,
+      frameHeight: 48,
     });
-    this.load.spritesheet('dog1-walk-left', '../assets/dog2/Walk-Left.png', {
-      frameWidth: 64,
-      frameHeight: 64,
+    this.load.spritesheet("dog1-walk-left", "../assets/dog1/Walk-Left.png", {
+      frameWidth: 48,
+      frameHeight: 48,
     });
-    this.load.spritesheet('dog1-attack', '../assets/dog1/Attack.png', {
-      frameWidth: 64,
-      frameHeight: 64,
+    this.load.spritesheet("dog1-attack", "../assets/dog1/Attack.png", {
+      frameWidth: 48,
+      frameHeight: 48,
     });
-    this.load.spritesheet('dog1-hurt', '../assets/dog1/Hurt.png', {
-      frameWidth: 64,
-      frameHeight: 64,
+    this.load.spritesheet("dog1-hurt", "../assets/dog1/Hurt.png", {
+      frameWidth: 48,
+      frameHeight: 48,
     });
-    this.load.spritesheet('dog1-ko', '../assets/dog1/Death.png', {
-      frameWidth: 64,
-      frameHeight: 64,
+    this.load.spritesheet("dog1-ko", "../assets/dog1/Death.png", {
+      frameWidth: 48,
+      frameHeight: 48,
     });
 
     //Dog 2
-    this.load.spritesheet('dog2-idle', '../assets/dog2/Idle.png', {
-      frameWidth: 64,
-      frameHeight: 64,
+    this.load.spritesheet("dog2-idle", "../assets/dog2/Idle.png", {
+      frameWidth: 48,
+      frameHeight: 48,
     });
-    this.load.spritesheet('dog2-walk', '../assets/dog2/Walk.png', {
-      frameWidth: 64,
-      frameHeight: 64,
+    this.load.spritesheet("dog2-walk", "../assets/dog2/Walk.png", {
+      frameWidth: 48,
+      frameHeight: 48,
     });
-    this.load.spritesheet('dog2-walk-left', '../assets/dog2/Walk-Left.png', {
-      frameWidth: 64,
-      frameHeight: 64,
+    this.load.spritesheet("dog2-walk-left", "../assets/dog2/Walk-Left.png", {
+      frameWidth: 48,
+      frameHeight: 48,
     });
-    this.load.spritesheet('dog2-attack', '../assets/dog2/Attack.png', {
-      frameWidth: 64,
-      frameHeight: 64,
+    this.load.spritesheet("dog2-attack", "../assets/dog2/Attack.png", {
+      frameWidth: 48,
+      frameHeight: 48,
     });
-    this.load.spritesheet('dog2-hurt', '../assets/dog2/Hurt.png', {
-      frameWidth: 64,
-      frameHeight: 64,
+    this.load.spritesheet("dog2-hurt", "../assets/dog2/Hurt.png", {
+      frameWidth: 48,
+      frameHeight: 48,
     });
-    this.load.spritesheet('dog2-ko', '../assets/dog2/Death.png', {
-      frameWidth: 64,
-      frameHeight: 64,
+    this.load.spritesheet("dog2-ko", "../assets/dog2/Death.png", {
+      frameWidth: 48,
+      frameHeight: 48,
     });
 
     //Loading maps & tilesets for maps
@@ -126,12 +129,9 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.load.tilemapTiledJSON("farm-map", "../assets/tiles/Farm.json");
 
     this.load.image("cliff-tiles", "../assets/tiles/Cliffs.png");
-    this.load.tilemapTiledJSON(
-      "cliff-map",
-      "assets/tiles/Cliffs.json"
-    );
+    this.load.tilemapTiledJSON("cliff-map", "assets/tiles/Cliffs.json");
 
-    this.load.image('bullet', '../assets/bullet.png');
+    this.load.image("bullet", "../assets/bullet.png");
   }
 
   //Fix
@@ -140,12 +140,17 @@ export default class HelloWorldScene extends Phaser.Scene {
     if (bullet) {
       bullet.setActive(true);
       bullet.setVisible(true);
-      this.physics.moveTo(bullet, this.input.x + this.cameras.main.scrollX, this.input.y + this.cameras.main.scrollY, 600); // 600 is the bullet speed
-      this.physics.add.collider(bullet, this.platforms, () => {
-        bullet.setActive(false);
-        bullet.setVisible(false);
-        bullet.setPosition(-100, -100);
-      });
+      this.physics.moveTo(
+        bullet,
+        this.input.x + this.cameras.main.scrollX,
+        this.input.y + this.cameras.main.scrollY,
+        600
+      ); // 600 is the bullet speed
+      // this.physics.add.collider(bullet, this.platforms, () => {
+      //   bullet.setActive(false);
+      //   bullet.setVisible(false);
+      //   bullet.setPosition(-100, -100);
+      // });
     }
   }
 
@@ -165,80 +170,112 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     //Dog-1 Movements
     this.anims.create({
-      key: 'dog1-idle',
-      frames: this.anims.generateFrameNumbers('dog1-idle', {start: 0, end: 3}),
+      key: "dog1-idle",
+      frames: this.anims.generateFrameNumbers("dog1-idle", {
+        start: 0,
+        end: 3,
+      }),
       frameRate: 10,
-      repeat: -1
-  });
+      repeat: -1,
+    });
 
     this.anims.create({
-      key: 'dog-1walk',
-      frames: this.anims.generateFrameNumbers('dog1-walk', {start: 0, end: 5}),
+      key: "dog1-walk",
+      frames: this.anims.generateFrameNumbers("dog1-walk", {
+        start: 0,
+        end: 5,
+      }),
       frameRate: 10,
-      repeat: -1
-  });
+      repeat: -1,
+    });
 
-  this.anims.create({
-    key: 'dog1-attack',
-    frames: this.anims.generateFrameNumbers('dog1-attack', {start: 0, end: 3}),
-    frameRate: 10,
-    repeat: -1
-  });
+    this.anims.create({
+      key: "dog1-walk-left",
+      frames: this.anims.generateFrameNumbers("dog1-walk-left", {
+        start: 0,
+        end: 5,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
 
-  this.anims.create({
-    key: 'dog1-hurt',
-    frames: this.anims.generateFrameNumbers('dog1-hurt', {start: 0, end: 1}),
-    frameRate: 10,
-  });
+    this.anims.create({
+      key: "dog1-attack",
+      frames: this.anims.generateFrameNumbers("dog1-attack", {
+        start: 0,
+        end: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
 
-  this.anims.create({
-    key: 'dog1-ko',
-    frames: this.anims.generateFrameNumbers('dog1-ko', {start: 0, end: 3}),
-    frameRate: 10,
-  });
+    this.anims.create({
+      key: "dog1-hurt",
+      frames: this.anims.generateFrameNumbers("dog1-hurt", {
+        start: 0,
+        end: 1,
+      }),
+      frameRate: 10,
+    });
 
-  //Dog-2 Movements
-  this.anims.create({
-    key: 'dog2-idle',
-    frames: this.anims.generateFrameNumbers('dog2-idle', {start: 0, end: 3}),
-    frameRate: 10,
-    repeat: -1
-});
+    this.anims.create({
+      key: "dog1-ko",
+      frames: this.anims.generateFrameNumbers("dog1-ko", { start: 0, end: 3 }),
+      frameRate: 10,
+    });
 
-  this.anims.create({
-    key: 'dog2-walk',
-    frames: this.anims.generateFrameNumbers('dog2-walk', {start: 0, end: 5}),
-    frameRate: 10,
-    repeat: -1
-});
+    //Dog-2 Movements
+    this.anims.create({
+      key: "dog2-idle",
+      frames: this.anims.generateFrameNumbers("dog2-idle", {
+        start: 0,
+        end: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
 
-this.anims.create({
-  key: 'dog2-attack',
-  frames: this.anims.generateFrameNumbers('dog2-attack', {start: 0, end: 3}),
-  frameRate: 10,
-  repeat: -1
-});
+    this.anims.create({
+      key: "dog2-walk",
+      frames: this.anims.generateFrameNumbers("dog2-walk", {
+        start: 0,
+        end: 5,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
 
-this.anims.create({
-  key: 'dog2-hurt',
-  frames: this.anims.generateFrameNumbers('dog2-hurt', {start: 0, end: 1}),
-  frameRate: 10,
-});
+    this.anims.create({
+      key: "dog2-attack",
+      frames: this.anims.generateFrameNumbers("dog2-attack", {
+        start: 0,
+        end: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
 
-this.anims.create({
-  key: 'dog2-ko',
-  frames: this.anims.generateFrameNumbers('dog2-ko', {start: 0, end: 3}),
-  frameRate: 10,
-});
+    this.anims.create({
+      key: "dog2-hurt",
+      frames: this.anims.generateFrameNumbers("dog2-hurt", {
+        start: 0,
+        end: 1,
+      }),
+      frameRate: 10,
+    });
 
-
+    this.anims.create({
+      key: "dog2-ko",
+      frames: this.anims.generateFrameNumbers("dog2-ko", { start: 0, end: 3 }),
+      frameRate: 10,
+    });
 
     matter.world.add([
       matter.bodies.rectangle(400, 600, 800, 50, { isStatic: true }),
     ]);
 
     this.room.state.players.onAdd = (player: any, sessionId: string) => {
-      const entity = matter.add.sprite(100, 100, "dude", 5, {
+      const entity = matter.add.sprite(100, 100, "dog1-idle", 0, {
         isStatic: false,
       });
 
@@ -280,11 +317,11 @@ this.anims.create({
 
     //Weapons in progress
 
-    this.bullets = this.physics.add.group({
-      defaultKey: 'bullet',
-      maxSize: 10,
-      collideWorldBounds: false,
-    })
+    // this.bullets = this.physics.add.group({
+    //   defaultKey: "bullet",
+    //   maxSize: 10,
+    //   collideWorldBounds: false,
+    // });
 
     this.anims.create({
       key: "left",
@@ -306,10 +343,11 @@ this.anims.create({
       repeat: -1,
     });
 
-    const button = this.add.image(100, 100, 'button').setInteractive();
-    button.on('pointerdown', () => {
-      this.scene.start('FarmLevel')
-    })
+    const button = this.add.image(730, 50, "button").setInteractive();
+    button.setScale(0.1)
+    button.on("pointerdown", () => {
+      this.scene.start("FarmLevel");
+    });
   }
 
   update(time: number, delta: number): void {
@@ -341,12 +379,12 @@ this.anims.create({
 
     if (this.inputPayload.left && !this.inputPayload.right) {
       this.currentPlayer.x -= velocity;
-      this.currentPlayer.anims.play("left", true);
+      this.currentPlayer.anims.play("dog1-walk-left", true);
     } else if (this.inputPayload.right && !this.inputPayload.left) {
       this.currentPlayer.x += velocity;
-      this.currentPlayer.anims.play("right", true);
+      this.currentPlayer.anims.play("dog1-walk", true);
     } else {
-      this.currentPlayer.anims.play("turn");
+      this.currentPlayer.anims.play("dog1-idle", true);
     }
     this.room?.send(0, this.inputPayload);
 
