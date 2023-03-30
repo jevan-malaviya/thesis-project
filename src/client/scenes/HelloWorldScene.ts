@@ -52,6 +52,50 @@ export default class HelloWorldScene extends Phaser.Scene {
       frameHeight: 48,
     });
 
+    //Dog 1
+    this.load.spritesheet('dog1-idle', '../assets/dog1/Idle.png', {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
+    this.load.spritesheet('dog1-walk', '../assets/dog1/Walk.png', {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
+    this.load.spritesheet('dog1-attack', '../assets/dog1/Attack.png', {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
+    this.load.spritesheet('dog1-hurt', '../assets/dog1/Hurt.png', {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
+    this.load.spritesheet('dog1-ko', '../assets/dog1/Death.png', {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
+
+    //Dog 2
+    this.load.spritesheet('dog2-idle', '../assets/dog2/Idle.png', {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
+    this.load.spritesheet('dog2-walk', '../assets/dog2/Walk.png', {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
+    this.load.spritesheet('dog2-attack', '../assets/dog2/Attack.png', {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
+    this.load.spritesheet('dog2-hurt', '../assets/dog2/Hurt.png', {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
+    this.load.spritesheet('dog2-ko', '../assets/dog2/Death.png', {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
+
     //Loading maps & tilesets for maps
     this.load.image("retro-tiles", "../assets/tiles/Retro-Lines-Tiles.png");
     this.load.tilemapTiledJSON(
