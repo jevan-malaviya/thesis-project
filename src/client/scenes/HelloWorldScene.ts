@@ -15,6 +15,7 @@ export default class HelloWorldScene extends Phaser.Scene {
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private playerEntities: { [sessionId: string]: any } = {};
   private room?: Colyseus.Room;
+  private backgroundMusic!: Phaser.Sound.BaseSound;
 
   private bullets!: Phaser.Physics.Arcade.Group;
   private fireKey!: Phaser.Input.Keyboard.Key;
@@ -57,6 +58,8 @@ export default class HelloWorldScene extends Phaser.Scene {
       frameWidth: 32,
       frameHeight: 48,
     });
+
+    this.load.audio('backgroundMusic', '../assets/track1.mp3');
 
     this.load.image('button', '../assets/next-level.png');
 
@@ -149,6 +152,12 @@ export default class HelloWorldScene extends Phaser.Scene {
   async create() {
     const matter = this.matter;
     this.room = await this.client.joinOrCreate("my_room");
+
+    this.backgroundMusic = this.sound.add('backgroundMusic', {
+      volume: 0.5,
+      loop: true,
+    });
+    this.backgroundMusic.play();
 
     console.log(this.room.sessionId);
 

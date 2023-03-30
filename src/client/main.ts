@@ -7,6 +7,7 @@ import RetroLevel from "./scenes/RetroLevel";
 import MountainLevel from "./scenes/MountainLevel";
 import StarterMenu from "./scenes/StarterMenu";
 import Controls from "./scenes/Controls";
+import LevelSelect from "./scenes/LevelSelect";
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -19,7 +20,7 @@ const config: Phaser.Types.Core.GameConfig = {
       gravity: { y: 1 },
     },
   },
-  scene: [RetroLevel],
+  scene: [StarterMenu, Controls, LevelSelect, HelloWorldScene, FarmLevel, RetroLevel, MountainLevel],
   plugins: {
     scene: [
       { key: 'WeaponPlugin', plugin: WeaponPlugin, mapping: 'weapons' } 

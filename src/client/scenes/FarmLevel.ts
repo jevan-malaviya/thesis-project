@@ -8,6 +8,7 @@ export default class FarmLevel extends HelloWorldScene {
     private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
     private playerEntities: { [sessionId: string]: any } = {};
     private room?: Colyseus.Room;
+    private backgroundMusic!: Phaser.Sound.BaseSound;
   
     localRef?: Phaser.GameObjects.Rectangle;
     remoteRef?: Phaser.GameObjects.Rectangle;
@@ -43,20 +44,35 @@ export default class FarmLevel extends HelloWorldScene {
 
         this.load.image('farm-tiles', '../assets/tiles/Farm.png');
         this.load.tilemapTiledJSON('farm-map', '../assets/tiles/Farm.json');
+    
+          this.load.audio('backgroundMusic', '../assets/track2.mp3');
     }
 
     async create() {
         const matter = this.matter;
         this.room = await this.client.joinOrCreate("my_room");
 
+        this.backgroundMusic = this.sound.add('backgroundMusic', {
+            volume: 0.5,
+            loop: true,
+        });
+        this.backgroundMusic.play();
+
         matter.world.add([
             matter.bodies.rectangle(400, 600, 800, 50, { isStatic: true }),
           ]);
       
           this.room.state.players.onAdd = (player: any, sessionId: string) => {
-            const entity = matter.add.sprite(100, 100, "dude", 4, {
-              isStatic: false,
-            });
+            const entityBody = matter.bodies.rectangle(100, 100, 32, 48, {
+                isStatic: false,
+                friction: 0.01,
+                mass: 1,
+                restitution: 0.1,
+              });
+              
+              const entity = matter.add.sprite(100, 100, "dude", 4);
+              entity.setExistingBody(entityBody);;
+              
       
             this.playerEntities[sessionId] = entity;
             console.log(this.playerEntities);
@@ -99,6 +115,9 @@ export default class FarmLevel extends HelloWorldScene {
 
     const landscapeLayer = farmMap.createLayer('Landscape',farmTileset );
     const colliders = farmMap.createLayer('Fence', farmTileset);  
+
+    this.matter.world.convertTilemapLayer(colliders);
+
 
     colliders.setCollisionByProperty({Collides: true});
 

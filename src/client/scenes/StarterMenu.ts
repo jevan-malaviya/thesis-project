@@ -7,10 +7,6 @@ export default class StarterMenu extends Phaser.Scene {
     }
 
     preload() {
-        this.load.spritesheet('dog1-idle', '../assets/dog1/Idle.png', {
-            frameWidth: 64,
-            frameHeight: 64,
-          });
     }
 
     create() {
