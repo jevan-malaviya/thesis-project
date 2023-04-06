@@ -136,45 +136,6 @@ export default class HelloWorldScene extends Phaser.Scene {
     
   }
 
-  // initLevel(mapKey: string, tilesetKey: string) {
-  //   const map = this.make.tilemap({ key: mapKey});
-  //   const tileSet = map.addTilesetImage(tilesetKey);
-  //   const platforms = map.createLayer('Platforms', tileSet, 0,0);
-
-  //   platforms.setCollisionByProperty({ Collides: true });0.
-
-
-
-
-  //   this.matter.world.add([
-  //     this.matter.bodies.rectangle(400, 600, 800, 50, { isStatic: true }),
-  //   ]);
-
-  //   if(this.player){
-  //     this.player.setPosition()
-  //   this.physics.add.collider(this.player, platforms);
-  //   }
-  // }
-
-  //Fix
-  // fireBullet(player: PlayerSprite) {
-  //   const bullet = player.weapon.get(player.x, player.y);
-  //   if (bullet) {
-  //     bullet.setActive(true);
-  //     bullet.setVisible(true);
-  //     this.physics.moveTo(
-  //       bullet,
-  //       this.input.x + this.cameras.main.scrollX,
-  //       this.input.y + this.cameras.main.scrollY,
-  //       600
-  //     ); // 600 is the bullet speed
-  //     // this.physics.add.collider(bullet, this.platforms, () => {
-  //     //   bullet.setActive(false);
-  //     //   bullet.setVisible(false);
-  //     //   bullet.setPosition(-100, -100);
-  //     // });
-  //   } 
-  // }
 
   createPlatformLayer(map: Phaser.Tilemaps.Tilemap, layerName: string, tilesetKey: string): Phaser.Tilemaps.TilemapLayer {
     const tileset = map.addTilesetImage(tilesetKey);
@@ -184,13 +145,6 @@ export default class HelloWorldScene extends Phaser.Scene {
     return layer;
   }
 
-  // changeLevel(mapKey: string, tilesetKey: string){
-  //   this.matter.world.remove(this.platforms);
-  //   this.platforms.destroy();
-
-  //   this.initLevel(mapKey, tilesetKey);
-
-  // }
 
   async create() {
     const matter = this.matter;
@@ -205,13 +159,6 @@ export default class HelloWorldScene extends Phaser.Scene {
     console.log(this.room.sessionId);
 
     this.add.image(400, 300, "sky");
-
-    // const map = this.make.tilemap({ key: 'farm-map'});
-    // const tileSet = map.addTilesetImage('farm-tiles');
-    // map.createStaticLayer('farm-map', tileSet);
-
-
-    // this.initLevel('farm-map', 'farm-tiles');
 
     //Dog-1 Movements
     this.anims.create({
@@ -360,13 +307,6 @@ export default class HelloWorldScene extends Phaser.Scene {
       }
     };
 
-    //Weapons in progress
-
-    // this.bullets = this.physics.add.group({
-    //   defaultKey: "bullet",
-    //   maxSize: 10,
-    //   collideWorldBounds: false,
-    // });
 
     this.anims.create({
       key: "left",
@@ -408,9 +348,6 @@ export default class HelloWorldScene extends Phaser.Scene {
       this.fixedTick(time, this.fixedTimeStep);
     }
 
-    // if (this.fireKey.isDown) {
-    //   this.fireBullet(this.player as PlayerSprite);
-    // }
   }
 
   fixedTick(time: number, delta: number) {
@@ -434,10 +371,6 @@ export default class HelloWorldScene extends Phaser.Scene {
       this.currentPlayer.anims.play("dog1-idle", true);
     }
     this.room?.send(0, this.inputPayload);
-
-    // if (this.spacebar.isDown) {
-    //   this.fireBullet(this.currentPlayer);
-    // }
 
     if (this.inputPayload.up) {
       this.currentPlayer.y -= 10;
