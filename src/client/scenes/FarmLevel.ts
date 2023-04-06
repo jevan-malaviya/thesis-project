@@ -102,7 +102,11 @@ export default class FarmLevel extends HelloWorldScene {
           ]);
 
           matter.world.add([
-            matter.bodies.rectangle(200, 417, 50, 25, { isStatic: true }),
+            matter.bodies.rectangle(146, 355, 100, 25, { isStatic: true }),
+          ]);
+
+          matter.world.add([
+            matter.bodies.rectangle(645, 407, 205, 25, { isStatic: true }),
           ]);
       
           this.room.state.players.onAdd = (player: any, sessionId: string) => {
