@@ -58,6 +58,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.load.image("ground", "../assets/platform.png");
     this.load.image("star", "../assets/star.png");
     this.load.image("bomb", "../assets/bomb.png");
+    this.load.image('platform', '../assets/tiles/platform.png')
     this.load.spritesheet("dude", "/assets/dude.png", {
       frameWidth: 32,
       frameHeight: 48,
@@ -158,7 +159,31 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     console.log(this.room.sessionId);
 
+    const { width } = this.scale;
     this.add.image(400, 300, "sky");
+
+    const ground = this.matter.add.image(width, 600, 'platform', undefined, {
+      isStatic: true
+    });
+    const scaleX = this.scale.width / ground.width;
+    ground.setScale(scaleX, .3);
+    ground.setPosition(this.scale.width * 0.5, this.scale.height - ground.displayHeight * 0.5);
+
+    const platform1 = this.matter.add.image(180, 420, 'ground', undefined, {
+      isStatic: true
+    });
+    platform1.setScale(.5)
+
+    const platform2 = this.matter.add.image(620, 420, 'ground', undefined, {
+      isStatic: true
+    });
+    platform2.setScale(.5)
+
+    const platform3 = this.matter.add.image(width * .5, 300, 'ground', undefined, {
+      isStatic: true
+    });
+    platform3.setScale(.5)
+
 
     //Dog-1 Movements
     this.anims.create({
@@ -373,7 +398,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.room?.send(0, this.inputPayload);
 
     if (this.inputPayload.up) {
-      this.currentPlayer.y -= 10;
+      this.currentPlayer.y -= 25;
     }
 
     if (this.inputPayload.down){

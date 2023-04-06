@@ -160,12 +160,12 @@ export default class CliffLevel extends HelloWorldScene {
     const cliffMap = this.make.tilemap({ key: 'cliff-map' });
     const cliffTileset = cliffMap.addTilesetImage('Cliff', 'cliff-tiles');
 
-    const landscapeLayer = cliffMap.createLayer('Landscape',cliffTileset );
+    const landscapeLayer = cliffMap.createLayer('Platforms',cliffTileset );
     const colliders = cliffMap.createLayer('Ground', cliffTileset); 
   
 
-    const spawnLayer = cliffMap.getObjectLayer('Spawns');
-    const spawnObjects = spawnLayer.objects;
+    // const spawnLayer = cliffMap.getObjectLayer('Spawns');
+    // const spawnObjects = spawnLayer.objects;
 
     this.matter.world.convertTilemapLayer(colliders);
     
