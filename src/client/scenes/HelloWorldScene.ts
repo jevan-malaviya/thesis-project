@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import * as Colyseus from "colyseus.js";
+import { BodyType } from "matter";
 // import WeaponPlugin from 'phaser3-weapon-plugin';
 type PlayerSprite = Phaser.GameObjects.Sprite &
   Phaser.Types.Physics.Arcade.SpriteWithDynamicBody & {
@@ -100,6 +101,7 @@ export default class HelloWorldScene extends Phaser.Scene {
       const entity = matter.add.sprite(100, 100, "dude", 4, {
         isStatic: false,
       });
+      matter.body.setInertia(matter.getMatterBodies([entity])[0], Infinity);
 
       this.playerEntities[sessionId] = entity;
       console.log(this.playerEntities);

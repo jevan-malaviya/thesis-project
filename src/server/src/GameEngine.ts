@@ -65,6 +65,7 @@ export class GameEngine {
     const startY = 100;
     const newPlayer = Matter.Bodies.rectangle(startX, startY, 32, 48, {
       isStatic: false,
+      inertia: Infinity,
     });
     this.players[sessionId] = newPlayer;
 
