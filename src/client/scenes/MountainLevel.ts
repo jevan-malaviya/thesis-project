@@ -1,22 +1,22 @@
-import Phaser from "phaser";
+import HelloWorldScene from "./HelloWorldScene";
 
-export default class MountainLevel extends Phaser.Scene {
+export default class Cliffs extends HelloWorldScene {
 
     constructor() {
-        super('MountainLevel')
+        super('Cliffs')
     }
 
     preload() {
 
     }
 
-    create() {
+    async create() {
     
-    const mountainMap = this.make.tilemap({ key: 'mountain-map' });
-    const mountainTileset = mountainMap.addTilesetImage('Mountain', 'mountain-tiles');
+    const cliffMap = this.make.tilemap({ key: 'mcliff-map' });
+    const cliffTileset = cliffnMap.addTilesetImage('Cliffs', 'mocliff-tiles');
 
-    mountainMap.createLayer('Landscape',mountainTileset );
-    const colliders = mountainMap.createLayer('Fence', mountainTileset);
+    cliffMap.createLayer('Landscape', cliffTileset );
+    const colliders = cliffMap.createLayer('Ground', cliffTileset);
 
     colliders.setCollisionByProperty({Collides: true})
     
