@@ -1,7 +1,6 @@
 import Phaser from "phaser";
 import * as Colyseus from "colyseus.js";
-import { BodyType } from "matter";
-// import WeaponPlugin from 'phaser3-weapon-plugin';
+
 type PlayerSprite = Phaser.GameObjects.Sprite &
   Phaser.Types.Physics.Arcade.SpriteWithDynamicBody & {
     body: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody["body"];
@@ -16,8 +15,6 @@ export default class HelloWorldScene extends Phaser.Scene {
   private playerEntities: { [sessionId: string]: any } = {};
   private room?: Colyseus.Room;
 
-  private weapon!: any;
-
   localRef?: Phaser.GameObjects.Rectangle;
   remoteRef?: Phaser.GameObjects.Rectangle;
 
@@ -27,6 +24,8 @@ export default class HelloWorldScene extends Phaser.Scene {
     up: false,
     down: false,
     tick: 0,
+    face: "",
+    shoot: false,
   };
 
   elapsedTime = 0;
@@ -69,21 +68,6 @@ export default class HelloWorldScene extends Phaser.Scene {
       "assets/tiles/MountainRange.json"
     );
   }
-
-  //Fix
-  //   fireBullet(player: PlayerSprite) {
-  //   const bullet = player.weapon.get(player.x, player.y);
-  //   if (bullet) {
-  //     bullet.setActive(true);
-  //     bullet.setVisible(true);
-  //     this.physics.moveTo(bullet, this.input.x + this.cameras.main.scrollX, this.input.y + this.cameras.main.scrollY, 600); // 600 is the bullet speed
-  //     this.physics.add.collider(bullet, platforms, () => {
-  //       bullet.setActive(false);
-  //       bullet.setVisible(false);
-  //       bullet.setPosition(-100, -100);
-  //     });
-  //   }
-  // }
 
   async create() {
     const matter = this.matter;
@@ -139,20 +123,6 @@ export default class HelloWorldScene extends Phaser.Scene {
       }
     };
 
-    //Weapons in progress
-
-    // this.plugins.addScenePlugin('weaponplugin', WeaponPlugin, true);
-    // this.weapon = this.add.weapon(10, 'bullet'); //this has to be replaced with an image of a bullet once working
-
-    // this.weapon.bulletSpeed = 600;
-    // this.weapon.fireRate = 100;
-
-    // this.weapon.trackSprite(this.player, 0, 0, true);
-
-    // this.input.on('pointerdown', () => {
-    //   this.weapon.fire();
-    // })
-
     this.anims.create({
       key: "left",
       frames: this.anims.generateFrameNumbers("dude", { start: 0, end: 3 }),
@@ -194,17 +164,27 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.inputPayload.left = this.cursors.left.isDown;
     this.inputPayload.right = this.cursors.right.isDown;
     this.inputPayload.up = this.cursors.up.isDown;
-
     this.inputPayload.tick = this.currentTick;
+    this.inputPayload.shoot =
+      this.cursors.space.isDown && this.currentTick % 5 === 0;
 
     if (this.inputPayload.left && !this.inputPayload.right) {
       this.currentPlayer.x -= velocity;
       this.currentPlayer.anims.play("left", true);
+      this.currentPlayer.face = "left";
+      this.inputPayload.face = "left";
     } else if (this.inputPayload.right && !this.inputPayload.left) {
       this.currentPlayer.x += velocity;
       this.currentPlayer.anims.play("right", true);
+      this.currentPlayer.face = "right";
+      this.inputPayload.face = "right";
     } else {
       this.currentPlayer.anims.play("turn");
+    }
+
+    if (this.inputPayload.shoot) {
+      console.log(`shoot!`);
+      this.shoot();
     }
     this.room?.send(0, this.inputPayload);
 
@@ -228,26 +208,23 @@ export default class HelloWorldScene extends Phaser.Scene {
       entity.x = Phaser.Math.Linear(entity.x, serverX, 0.2);
       entity.y = Phaser.Math.Linear(entity.y, serverY, 0.2);
     }
+  }
 
-    //Fix
-    if (this.player) {
-      this.player.weapon.children.iterate(
-        //@ts-ignore
-        (bullet: Phaser.Physics.Arcade.Image) => {
-          if (bullet.active) {
-            if (
-              bullet.x < 0 ||
-              bullet.x > this.physics.world.bounds.width ||
-              bullet.y < 0 ||
-              bullet.y > this.physics.world.bounds.height
-            ) {
-              bullet.setActive(false);
-              bullet.setVisible(false);
-              bullet.setPosition(-100, -100);
-            }
-          }
-        }
-      );
-    }
+  shoot() {
+    let offset = 0;
+    if (this.currentPlayer.face === "right") offset = 35;
+    if (this.currentPlayer.face === "left") offset = -35;
+    const bullet = this.matter.add.image(
+      this.currentPlayer.x + offset,
+      this.currentPlayer.y,
+      "star",
+      undefined,
+      {
+        frictionAir: 0,
+        ignoreGravity: true,
+      }
+    );
+    if (this.currentPlayer.face === "right") bullet.setVelocityX(10);
+    if (this.currentPlayer.face === "left") bullet.setVelocityX(-10);
   }
 }

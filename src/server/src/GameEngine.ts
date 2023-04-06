@@ -1,4 +1,4 @@
-import Matter, { Bodies, Engine, World } from "matter-js";
+import Matter, { Bodies, Body, Engine, World } from "matter-js";
 import { MyRoomState } from "./rooms/schema/MyRoomState";
 
 export class GameEngine {
@@ -40,7 +40,6 @@ export class GameEngine {
     // Update events to sync bodies in the world to the state.
     Matter.Events.on(this.engine, "afterUpdate", () => {
       for (const name in this.players) {
-        // console.log(name);
         // Make sure we still have the player in the world or state.
         if (!this.state.players.get(name) || !this.players[name]) {
           continue;
@@ -91,6 +90,7 @@ export class GameEngine {
   }
 
   processPlayerAction(sessionId: string, data: any) {
+    const world = this.world;
     const worldPlayer = this.players[sessionId];
     if (!worldPlayer) {
       return;
@@ -99,6 +99,7 @@ export class GameEngine {
     const currentPosition = worldPlayer.position;
     let newX = currentPosition.x;
     let newY = currentPosition.y;
+
     // Modify position based on data received from clients.
     if (data.left) {
       newX -= 4;
@@ -109,6 +110,16 @@ export class GameEngine {
     if (data.up) {
       newY -= 10;
     }
+    if (data.face === "left") {
+      worldPlayer.face = "left";
+      console.log(`${worldPlayer} facing left`);
+    }
+    if (data.face === "right") {
+      worldPlayer.face = "right";
+      console.log(`${worldPlayer} facing right`);
+    }
+    if (data.shoot) {
+    }
 
     // Update in the world
     Matter.Body.setPosition(worldPlayer, { x: newX, y: newY });
@@ -116,5 +127,21 @@ export class GameEngine {
     // Update in the state
     this.state.players.get(sessionId).x = newX;
     this.state.players.get(sessionId).y = newY;
+
+    function shoot() {
+      let offset = 0;
+      if (worldPlayer.face === "right") offset = 35;
+      if (worldPlayer.face === "left") offset = -35;
+      const bullet = Matter.Bodies.rectangle(
+        worldPlayer.position.x + offset,
+        worldPlayer.position.y,
+        12,
+        12,
+        {
+          frictionAir: 0,
+        }
+      );
+      Matter.World.add(world, bullet);
+    }
   }
 }

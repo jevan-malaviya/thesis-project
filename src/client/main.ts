@@ -19,10 +19,8 @@ const config: Phaser.Types.Core.GameConfig = {
   },
   scene: [HelloWorldScene, FarmLevel, RetroLevel, MountainLevel],
   plugins: {
-    scene: [
-      { key: 'WeaponPlugin', plugin: WeaponPlugin, mapping: 'weapons' } 
-    ]
-  }
+    scene: [{ key: "WeaponPlugin", plugin: WeaponPlugin, mapping: "weapons" }],
+  },
 };
 
 export default new Phaser.Game(config);

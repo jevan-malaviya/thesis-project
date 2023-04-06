@@ -5,6 +5,8 @@ export interface InputData {
   right: false;
   up: false;
   tick: number;
+  face: string;
+  shoot: false;
 }
 
 export class Player extends Schema {
@@ -17,6 +19,8 @@ export class Player extends Schema {
 
   @type("number")
   vy = 0;
+
+  @type("string") face: string;
 
   inputQueue: InputData[] = [];
 }
