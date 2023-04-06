@@ -29,12 +29,12 @@ export default class LevelSelect extends Phaser.Scene {
             this.scene.start('FarmLevel');
         });
 
-        const retroButton = this.add.text(400, 350, 'Retro', { fontSize: '32px', color: '#FFFFFF'});
-        retroButton.setOrigin(0.5);
-        retroButton.setInteractive();
+        const cliffButton = this.add.text(400, 350, 'Cliff', { fontSize: '32px', color: '#FFFFFF'});
+        cliffButton.setOrigin(0.5);
+        cliffButton.setInteractive();
 
-        retroButton.on('pointerdown', ()=> {
-            this.scene.start('RetroLevel');
+        cliffButton.on('pointerdown', ()=> {
+            this.scene.start('CliffLevel');
         });
     }
 }

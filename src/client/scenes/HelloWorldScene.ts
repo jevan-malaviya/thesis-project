@@ -59,6 +59,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.load.image("ground", "../assets/platform.png");
     this.load.image("star", "../assets/star.png");
     this.load.image("bomb", "../assets/bomb.png");
+    this.load.image('platform', '../assets/tiles/platform.png')
     this.load.spritesheet("dude", "/assets/dude.png", {
       frameWidth: 32,
       frameHeight: 48,
@@ -137,45 +138,6 @@ export default class HelloWorldScene extends Phaser.Scene {
     
   }
 
-  // initLevel(mapKey: string, tilesetKey: string) {
-  //   const map = this.make.tilemap({ key: mapKey});
-  //   const tileSet = map.addTilesetImage(tilesetKey);
-  //   const platforms = map.createLayer('Platforms', tileSet, 0,0);
-
-  //   platforms.setCollisionByProperty({ Collides: true });0.
-
-
-
-
-  //   this.matter.world.add([
-  //     this.matter.bodies.rectangle(400, 600, 800, 50, { isStatic: true }),
-  //   ]);
-
-  //   if(this.player){
-  //     this.player.setPosition()
-  //   this.physics.add.collider(this.player, platforms);
-  //   }
-  // }
-
-  //Fix
-  // fireBullet(player: PlayerSprite) {
-  //   const bullet = player.weapon.get(player.x, player.y);
-  //   if (bullet) {
-  //     bullet.setActive(true);
-  //     bullet.setVisible(true);
-  //     this.physics.moveTo(
-  //       bullet,
-  //       this.input.x + this.cameras.main.scrollX,
-  //       this.input.y + this.cameras.main.scrollY,
-  //       600
-  //     ); // 600 is the bullet speed
-  //     // this.physics.add.collider(bullet, this.platforms, () => {
-  //     //   bullet.setActive(false);
-  //     //   bullet.setVisible(false);
-  //     //   bullet.setPosition(-100, -100);
-  //     // });
-  //   } 
-  // }
 
   createPlatformLayer(map: Phaser.Tilemaps.Tilemap, layerName: string, tilesetKey: string): Phaser.Tilemaps.TilemapLayer {
     const tileset = map.addTilesetImage(tilesetKey);
@@ -185,13 +147,6 @@ export default class HelloWorldScene extends Phaser.Scene {
     return layer;
   }
 
-  // changeLevel(mapKey: string, tilesetKey: string){
-  //   this.matter.world.remove(this.platforms);
-  //   this.platforms.destroy();
-
-  //   this.initLevel(mapKey, tilesetKey);
-
-  // }
 
   async create() {
     const matter = this.matter;
@@ -205,14 +160,31 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     console.log(this.room.sessionId);
 
+    const { width } = this.scale;
     this.add.image(400, 300, "sky");
 
-    // const map = this.make.tilemap({ key: 'farm-map'});
-    // const tileSet = map.addTilesetImage('farm-tiles');
-    // map.createStaticLayer('farm-map', tileSet);
+    const ground = this.matter.add.image(width, 600, 'platform', undefined, {
+      isStatic: true
+    });
+    const scaleX = this.scale.width / ground.width;
+    ground.setScale(scaleX, .3);
+    ground.setPosition(this.scale.width * 0.5, this.scale.height - ground.displayHeight * 0.5);
 
+    const platform1 = this.matter.add.image(180, 420, 'ground', undefined, {
+      isStatic: true
+    });
+    platform1.setScale(.5)
 
-    // this.initLevel('farm-map', 'farm-tiles');
+    const platform2 = this.matter.add.image(620, 420, 'ground', undefined, {
+      isStatic: true
+    });
+    platform2.setScale(.5)
+
+    const platform3 = this.matter.add.image(width * .5, 300, 'ground', undefined, {
+      isStatic: true
+    });
+    platform3.setScale(.5)
+
 
     //Dog-1 Movements
     this.anims.create({
@@ -362,13 +334,6 @@ export default class HelloWorldScene extends Phaser.Scene {
       }
     };
 
-    //Weapons in progress
-
-    // this.bullets = this.physics.add.group({
-    //   defaultKey: "bullet",
-    //   maxSize: 10,
-    //   collideWorldBounds: false,
-    // });
 
     this.anims.create({
       key: "left",
@@ -410,9 +375,6 @@ export default class HelloWorldScene extends Phaser.Scene {
       this.fixedTick(time, this.fixedTimeStep);
     }
 
-    // if (this.fireKey.isDown) {
-    //   this.fireBullet(this.player as PlayerSprite);
-    // }
   }
 
   fixedTick(time: number, delta: number) {
@@ -437,12 +399,8 @@ export default class HelloWorldScene extends Phaser.Scene {
     }
     this.room?.send(0, this.inputPayload);
 
-    // if (this.spacebar.isDown) {
-    //   this.fireBullet(this.currentPlayer);
-    // }
-
     if (this.inputPayload.up) {
-      this.currentPlayer.y -= 10;
+      this.currentPlayer.y -= 25;
     }
 
     if (this.inputPayload.down){
