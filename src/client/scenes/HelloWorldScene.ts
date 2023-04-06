@@ -94,7 +94,7 @@ export default class HelloWorldScene extends Phaser.Scene {
         this.currentPlayer = entity;
 
         this.localRef = this.add.rectangle(0, 0, entity.width, entity.height);
-        this.localRef.setStrokeStyle(1, 0x00ff00); // green
+        this.localRef.setStrokeStyle(1, 0x0000ff); // purple
 
         this.remoteRef = this.add.rectangle(0, 0, entity.width, entity.height);
         this.remoteRef.setStrokeStyle(1, 0xff0000); // red

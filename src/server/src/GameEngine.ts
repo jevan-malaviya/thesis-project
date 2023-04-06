@@ -112,11 +112,9 @@ export class GameEngine {
     }
     if (data.face === "left") {
       worldPlayer.face = "left";
-      console.log(`${worldPlayer} facing left`);
     }
     if (data.face === "right") {
       worldPlayer.face = "right";
-      console.log(`${worldPlayer} facing right`);
     }
     if (data.shoot) {
     }
