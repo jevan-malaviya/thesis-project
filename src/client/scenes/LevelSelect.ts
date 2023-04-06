@@ -28,5 +28,13 @@ export default class LevelSelect extends Phaser.Scene {
         farmButton.on('pointerdown', ()=> {
             this.scene.start('FarmLevel');
         });
+
+        const retroButton = this.add.text(400, 350, 'Retro', { fontSize: '32px', color: '#FFFFFF'});
+        retroButton.setOrigin(0.5);
+        retroButton.setInteractive();
+
+        retroButton.on('pointerdown', ()=> {
+            this.scene.start('RetroLevel');
+        });
     }
 }

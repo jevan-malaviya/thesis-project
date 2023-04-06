@@ -16,6 +16,7 @@ export default class HelloWorldScene extends Phaser.Scene {
   private playerEntities: { [sessionId: string]: any } = {};
   private room?: Colyseus.Room;
   private backgroundMusic!: Phaser.Sound.BaseSound;
+  private platforms?: Phaser.Tilemaps.TilemapLayer;
 
   private bullets!: Phaser.Physics.Arcade.Group;
   private fireKey!: Phaser.Input.Keyboard.Key;
@@ -126,33 +127,70 @@ export default class HelloWorldScene extends Phaser.Scene {
     );
 
     this.load.image("farm-tiles", "../assets/tiles/Farm.png");
-    this.load.tilemapTiledJSON("farm-map", "../assets/tiles/Farm.json");
+    this.load.tilemapTiledJSON("farm-map", "../assets/tiles/FarmLevel.json");
 
     this.load.image("cliff-tiles", "../assets/tiles/Cliffs.png");
     this.load.tilemapTiledJSON("cliff-map", "assets/tiles/Cliffs.json");
 
     this.load.image("bullet", "../assets/bullet.png");
+    
   }
 
+  // initLevel(mapKey: string, tilesetKey: string) {
+  //   const map = this.make.tilemap({ key: mapKey});
+  //   const tileSet = map.addTilesetImage(tilesetKey);
+  //   const platforms = map.createLayer('Platforms', tileSet, 0,0);
+
+  //   platforms.setCollisionByProperty({ Collides: true });0.
+
+
+
+
+  //   this.matter.world.add([
+  //     this.matter.bodies.rectangle(400, 600, 800, 50, { isStatic: true }),
+  //   ]);
+
+  //   if(this.player){
+  //     this.player.setPosition()
+  //   this.physics.add.collider(this.player, platforms);
+  //   }
+  // }
+
   //Fix
-  fireBullet(player: PlayerSprite) {
-    const bullet = player.weapon.get(player.x, player.y);
-    if (bullet) {
-      bullet.setActive(true);
-      bullet.setVisible(true);
-      this.physics.moveTo(
-        bullet,
-        this.input.x + this.cameras.main.scrollX,
-        this.input.y + this.cameras.main.scrollY,
-        600
-      ); // 600 is the bullet speed
-      // this.physics.add.collider(bullet, this.platforms, () => {
-      //   bullet.setActive(false);
-      //   bullet.setVisible(false);
-      //   bullet.setPosition(-100, -100);
-      // });
-    }
+  // fireBullet(player: PlayerSprite) {
+  //   const bullet = player.weapon.get(player.x, player.y);
+  //   if (bullet) {
+  //     bullet.setActive(true);
+  //     bullet.setVisible(true);
+  //     this.physics.moveTo(
+  //       bullet,
+  //       this.input.x + this.cameras.main.scrollX,
+  //       this.input.y + this.cameras.main.scrollY,
+  //       600
+  //     ); // 600 is the bullet speed
+  //     // this.physics.add.collider(bullet, this.platforms, () => {
+  //     //   bullet.setActive(false);
+  //     //   bullet.setVisible(false);
+  //     //   bullet.setPosition(-100, -100);
+  //     // });
+  //   } 
+  // }
+
+  createPlatformLayer(map: Phaser.Tilemaps.Tilemap, layerName: string, tilesetKey: string): Phaser.Tilemaps.TilemapLayer {
+    const tileset = map.addTilesetImage(tilesetKey);
+    const layer = map.createLayer(layerName, tileset, 0, 0);
+    layer.setCollisionByProperty({ collides: true });
+    this.matter.world.convertTilemapLayer(layer);
+    return layer;
   }
+
+  // changeLevel(mapKey: string, tilesetKey: string){
+  //   this.matter.world.remove(this.platforms);
+  //   this.platforms.destroy();
+
+  //   this.initLevel(mapKey, tilesetKey);
+
+  // }
 
   async create() {
     const matter = this.matter;
@@ -167,6 +205,13 @@ export default class HelloWorldScene extends Phaser.Scene {
     console.log(this.room.sessionId);
 
     this.add.image(400, 300, "sky");
+
+    // const map = this.make.tilemap({ key: 'farm-map'});
+    // const tileSet = map.addTilesetImage('farm-tiles');
+    // map.createStaticLayer('farm-map', tileSet);
+
+
+    // this.initLevel('farm-map', 'farm-tiles');
 
     //Dog-1 Movements
     this.anims.create({
@@ -346,7 +391,8 @@ export default class HelloWorldScene extends Phaser.Scene {
     const button = this.add.image(730, 50, "button").setInteractive();
     button.setScale(0.1)
     button.on("pointerdown", () => {
-      this.scene.start("FarmLevel");
+      this.scene.start("level-select");
+      this.backgroundMusic.stop();
     });
   }
 
@@ -374,6 +420,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.inputPayload.left = this.cursors.left.isDown;
     this.inputPayload.right = this.cursors.right.isDown;
     this.inputPayload.up = this.cursors.up.isDown;
+    this.inputPayload.down = this.cursors.down.isDown;
 
     this.inputPayload.tick = this.currentTick;
 
@@ -394,6 +441,10 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     if (this.inputPayload.up) {
       this.currentPlayer.y -= 10;
+    }
+
+    if (this.inputPayload.down){
+      this.currentPlayer.anims.play('dog1-attack', true)
     }
 
     this.localRef!.x = this.currentPlayer.x;

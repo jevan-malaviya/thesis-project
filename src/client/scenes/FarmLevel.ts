@@ -37,8 +37,16 @@ export default class FarmLevel extends HelloWorldScene {
 
     preload() {
 
-        this.load.spritesheet("dude", "/assets/dude.png", {
-            frameWidth: 32,
+        this.load.spritesheet("dog1-idle", "../assets/dog1/Idle.png", {
+            frameWidth: 48,
+            frameHeight: 48,
+          });
+          this.load.spritesheet("dog1-walk", "../assets/dog1/Walk.png", {
+            frameWidth: 48,
+            frameHeight: 48,
+          });
+          this.load.spritesheet("dog1-walk-left", "../assets/dog1/Walk-Left.png", {
+            frameWidth: 48,
             frameHeight: 48,
           });
 
@@ -58,8 +66,43 @@ export default class FarmLevel extends HelloWorldScene {
         });
         this.backgroundMusic.play();
 
+        this.anims.create({
+            key: "dog1-idle",
+            frames: this.anims.generateFrameNumbers("dog1-idle", {
+              start: 0,
+              end: 3,
+            }),
+            frameRate: 10,
+            repeat: -1,
+          });
+      
+          this.anims.create({
+            key: "dog1-walk",
+            frames: this.anims.generateFrameNumbers("dog1-walk", {
+              start: 0,
+              end: 5,
+            }),
+            frameRate: 10,
+            repeat: -1,
+          });
+      
+          this.anims.create({
+            key: "dog1-walk-left",
+            frames: this.anims.generateFrameNumbers("dog1-walk-left", {
+              start: 0,
+              end: 5,
+            }),
+            frameRate: 10,
+            repeat: -1,
+          });
+          
+//400,530,800,50
         matter.world.add([
-            matter.bodies.rectangle(400, 600, 800, 50, { isStatic: true }),
+            matter.bodies.rectangle(400, 530, 800, 50, { isStatic: true }),
+          ]);
+
+          matter.world.add([
+            matter.bodies.rectangle(200, 417, 50, 25, { isStatic: true }),
           ]);
       
           this.room.state.players.onAdd = (player: any, sessionId: string) => {
@@ -70,7 +113,7 @@ export default class FarmLevel extends HelloWorldScene {
                 restitution: 0.1,
               });
               
-              const entity = matter.add.sprite(100, 100, "dude", 4);
+              const entity = matter.add.sprite(100, 100, "dog1-idle", 0);
               entity.setExistingBody(entityBody);;
               
       
@@ -114,9 +157,14 @@ export default class FarmLevel extends HelloWorldScene {
     const farmTileset = farmMap.addTilesetImage('Farm', 'farm-tiles');
 
     const landscapeLayer = farmMap.createLayer('Landscape',farmTileset );
-    const colliders = farmMap.createLayer('Fence', farmTileset);  
+    const colliders = farmMap.createLayer('Fence', farmTileset); 
+  
+
+    const spawnLayer = farmMap.getObjectLayer('Spawns');
+    const spawnObjects = spawnLayer.objects;
 
     this.matter.world.convertTilemapLayer(colliders);
+    
 
 
     colliders.setCollisionByProperty({Collides: true});
@@ -125,9 +173,9 @@ export default class FarmLevel extends HelloWorldScene {
     const scaleY = this.scale.height / farmMap.heightInPixels;
     const scale = Math.min(scaleX, scaleY);
 
-    landscapeLayer.setScale(scale);
-    colliders.setScale(scale);
-    
+    landscapeLayer.setScale(scaleX, scaleY);
+    colliders.setScale(scaleX, scaleY);
+    // this.cameras.main.setZoom(scale);
     
     }
 
@@ -160,12 +208,12 @@ export default class FarmLevel extends HelloWorldScene {
     
         if (this.inputPayload.left && !this.inputPayload.right) {
           this.currentPlayer.x -= velocity;
-          this.currentPlayer.anims.play("left", true);
+          this.currentPlayer.anims.play("dog1-walk-left", true);
         } else if (this.inputPayload.right && !this.inputPayload.left) {
           this.currentPlayer.x += velocity;
-          this.currentPlayer.anims.play("right", true);
+          this.currentPlayer.anims.play("dog1-walk", true);
         } else {
-          this.currentPlayer.anims.play("turn");
+          this.currentPlayer.anims.play("dog1-idle", true);
         }
         this.room?.send(0, this.inputPayload);
     
@@ -174,7 +222,7 @@ export default class FarmLevel extends HelloWorldScene {
         // }
     
         if (this.inputPayload.up) {
-          this.currentPlayer.y -= 10;
+          this.currentPlayer.y -= 25;
         }
     
         this.localRef!.x = this.currentPlayer.x;
