@@ -77,9 +77,10 @@ export default class HelloWorldScene extends Phaser.Scene {
 
     this.add.image(400, 300, "sky");
 
-    matter.world.add([
-      matter.bodies.rectangle(400, 600, 800, 50, { isStatic: true }),
-    ]);
+    const floor = matter.bodies.rectangle(400, 600, 800, 50, {
+      isStatic: true,
+    });
+    matter.world.add([floor]);
 
     this.room.state.players.onAdd = (player: any, sessionId: string) => {
       const entity = matter.add.sprite(100, 100, "dude", 4, {
