@@ -1,7 +1,6 @@
 import Phaser from "phaser";
 import * as Colyseus from "colyseus.js";
-import { BodyType } from "matter";
-// import WeaponPlugin from 'phaser3-weapon-plugin';
+
 type PlayerSprite = Phaser.GameObjects.Sprite &
   Phaser.Types.Physics.Arcade.SpriteWithDynamicBody & {
     body: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody["body"];
@@ -32,6 +31,8 @@ export default class HelloWorldScene extends Phaser.Scene {
     up: false,
     down: false,
     tick: 0,
+    face: "",
+    shoot: false,
   };
 
   elapsedTime = 0;
@@ -59,13 +60,13 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.load.image("ground", "../assets/platform.png");
     this.load.image("star", "../assets/star.png");
     this.load.image("bomb", "../assets/bomb.png");
-    this.load.image('platform', '../assets/tiles/platform.png')
+    this.load.image("platform", "../assets/tiles/platform.png");
     this.load.spritesheet("dude", "/assets/dude.png", {
       frameWidth: 32,
       frameHeight: 48,
     });
 
-    this.load.audio('backgroundMusic', '../assets/track1.mp3');
+    this.load.audio("backgroundMusic", "../assets/track1.mp3");
 
     this.load.image("button", "../assets/next-level.png");
 
@@ -135,11 +136,13 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.load.tilemapTiledJSON("cliff-map", "assets/tiles/Cliffs.json");
 
     this.load.image("bullet", "../assets/bullet.png");
-    
   }
 
-
-  createPlatformLayer(map: Phaser.Tilemaps.Tilemap, layerName: string, tilesetKey: string): Phaser.Tilemaps.TilemapLayer {
+  createPlatformLayer(
+    map: Phaser.Tilemaps.Tilemap,
+    layerName: string,
+    tilesetKey: string
+  ): Phaser.Tilemaps.TilemapLayer {
     const tileset = map.addTilesetImage(tilesetKey);
     const layer = map.createLayer(layerName, tileset, 0, 0);
     layer.setCollisionByProperty({ collides: true });
@@ -147,12 +150,11 @@ export default class HelloWorldScene extends Phaser.Scene {
     return layer;
   }
 
-
   async create() {
     const matter = this.matter;
     this.room = await this.client.joinOrCreate("my_room");
 
-    this.backgroundMusic = this.sound.add('backgroundMusic', {
+    this.backgroundMusic = this.sound.add("backgroundMusic", {
       volume: 0.5,
       loop: true,
     });
@@ -163,28 +165,36 @@ export default class HelloWorldScene extends Phaser.Scene {
     const { width } = this.scale;
     this.add.image(400, 300, "sky");
 
-    const ground = this.matter.add.image(width, 600, 'platform', undefined, {
-      isStatic: true
+    const ground = this.matter.add.image(width, 600, "platform", undefined, {
+      isStatic: true,
     });
     const scaleX = this.scale.width / ground.width;
-    ground.setScale(scaleX, .3);
-    ground.setPosition(this.scale.width * 0.5, this.scale.height - ground.displayHeight * 0.5);
+    ground.setScale(scaleX, 0.3);
+    ground.setPosition(
+      this.scale.width * 0.5,
+      this.scale.height - ground.displayHeight * 0.5
+    );
 
-    const platform1 = this.matter.add.image(180, 420, 'ground', undefined, {
-      isStatic: true
+    const platform1 = this.matter.add.image(180, 420, "ground", undefined, {
+      isStatic: true,
     });
-    platform1.setScale(.5)
+    platform1.setScale(0.5);
 
-    const platform2 = this.matter.add.image(620, 420, 'ground', undefined, {
-      isStatic: true
+    const platform2 = this.matter.add.image(620, 420, "ground", undefined, {
+      isStatic: true,
     });
-    platform2.setScale(.5)
+    platform2.setScale(0.5);
 
-    const platform3 = this.matter.add.image(width * .5, 300, 'ground', undefined, {
-      isStatic: true
-    });
-    platform3.setScale(.5)
-
+    const platform3 = this.matter.add.image(
+      width * 0.5,
+      300,
+      "ground",
+      undefined,
+      {
+        isStatic: true,
+      }
+    );
+    platform3.setScale(0.5);
 
     //Dog-1 Movements
     this.anims.create({
@@ -288,9 +298,10 @@ export default class HelloWorldScene extends Phaser.Scene {
       frameRate: 10,
     });
 
-    matter.world.add([
-      matter.bodies.rectangle(400, 600, 800, 50, { isStatic: true }),
-    ]);
+    const floor = matter.bodies.rectangle(400, 600, 800, 50, {
+      isStatic: true,
+    });
+    matter.world.add([floor]);
 
     this.room.state.players.onAdd = (player: any, sessionId: string) => {
       const entity = matter.add.sprite(100, 100, "dog1-idle", 0, {
@@ -305,7 +316,7 @@ export default class HelloWorldScene extends Phaser.Scene {
         this.currentPlayer = entity;
 
         this.localRef = this.add.rectangle(0, 0, entity.width, entity.height);
-        this.localRef.setStrokeStyle(1, 0x00ff00); // green
+        this.localRef.setStrokeStyle(1, 0x0000ff); // purple
 
         this.remoteRef = this.add.rectangle(0, 0, entity.width, entity.height);
         this.remoteRef.setStrokeStyle(1, 0xff0000); // red
@@ -334,7 +345,6 @@ export default class HelloWorldScene extends Phaser.Scene {
       }
     };
 
-
     this.anims.create({
       key: "left",
       frames: this.anims.generateFrameNumbers("dude", { start: 0, end: 3 }),
@@ -356,7 +366,7 @@ export default class HelloWorldScene extends Phaser.Scene {
     });
 
     const button = this.add.image(730, 50, "button").setInteractive();
-    button.setScale(0.1)
+    button.setScale(0.1);
     button.on("pointerdown", () => {
       this.scene.start("level-select");
       this.backgroundMusic.stop();
@@ -374,7 +384,6 @@ export default class HelloWorldScene extends Phaser.Scene {
       this.elapsedTime -= this.fixedTimeStep;
       this.fixedTick(time, this.fixedTimeStep);
     }
-
   }
 
   fixedTick(time: number, delta: number) {
@@ -384,27 +393,35 @@ export default class HelloWorldScene extends Phaser.Scene {
     this.inputPayload.left = this.cursors.left.isDown;
     this.inputPayload.right = this.cursors.right.isDown;
     this.inputPayload.up = this.cursors.up.isDown;
-    this.inputPayload.down = this.cursors.down.isDown;
-
     this.inputPayload.tick = this.currentTick;
+    this.inputPayload.shoot =
+      this.cursors.space.isDown && this.currentTick % 5 === 0;
 
     if (this.inputPayload.left && !this.inputPayload.right) {
       this.currentPlayer.x -= velocity;
       this.currentPlayer.anims.play("dog1-walk-left", true);
+      this.currentPlayer.face = "left";
+      this.inputPayload.face = "left";
     } else if (this.inputPayload.right && !this.inputPayload.left) {
       this.currentPlayer.x += velocity;
       this.currentPlayer.anims.play("dog1-walk", true);
+      this.currentPlayer.face = "right";
+      this.inputPayload.face = "right";
     } else {
       this.currentPlayer.anims.play("dog1-idle", true);
+    }
+
+    if (this.inputPayload.shoot) {
+      this.shoot();
     }
     this.room?.send(0, this.inputPayload);
 
     if (this.inputPayload.up) {
-      this.currentPlayer.y -= 25;
+      this.currentPlayer.y -= 10;
     }
 
-    if (this.inputPayload.down){
-      this.currentPlayer.anims.play('dog1-attack', true)
+    if (this.inputPayload.down) {
+      this.currentPlayer.anims.play("dog1-attack", true);
     }
 
     this.localRef!.x = this.currentPlayer.x;
@@ -423,26 +440,23 @@ export default class HelloWorldScene extends Phaser.Scene {
       entity.x = Phaser.Math.Linear(entity.x, serverX, 0.2);
       entity.y = Phaser.Math.Linear(entity.y, serverY, 0.2);
     }
+  }
 
-    //Fix
-    if (this.player) {
-      this.player.weapon.children.iterate(
-        //@ts-ignore
-        (bullet: Phaser.Physics.Arcade.Image) => {
-          if (bullet.active) {
-            if (
-              bullet.x < 0 ||
-              bullet.x > this.physics.world.bounds.width ||
-              bullet.y < 0 ||
-              bullet.y > this.physics.world.bounds.height
-            ) {
-              bullet.setActive(false);
-              bullet.setVisible(false);
-              bullet.setPosition(-100, -100);
-            }
-          }
-        }
-      );
-    }
+  shoot() {
+    let offset = 0;
+    if (this.currentPlayer.face === "right") offset = 35;
+    if (this.currentPlayer.face === "left") offset = -35;
+    const bullet = this.matter.add.image(
+      this.currentPlayer.x + offset,
+      this.currentPlayer.y,
+      "star",
+      undefined,
+      {
+        frictionAir: 0,
+        ignoreGravity: true,
+      }
+    );
+    if (this.currentPlayer.face === "right") bullet.setVelocityX(10);
+    if (this.currentPlayer.face === "left") bullet.setVelocityX(-10);
   }
 }
