@@ -38,11 +38,11 @@ Launch the game client in the browser on localhost, port 8000
 
 ## Tech Stack
 
-[Colyseus](https://github.com/colyseus/colyseus): An authoritative multiplayer framework for Node.js
-[Matterjs](https://brm.io/matter-js/): A rigid body 2D physics engine for Javascript
-[Phaser](https://www.phaser.io/): A Desktop and Mobile HTML 5 game framework
-[Tiled](https://www.mapeditor.org/): A flexible tile based map editor
-[Typescript](https://www.typescriptlang.org/)
+- [Colyseus](https://github.com/colyseus/colyseus): An authoritative multiplayer framework for Node.js
+- [Matterjs](https://brm.io/matter-js/): A rigid body 2D physics engine for Javascript
+- [Phaser](https://www.phaser.io/): A Desktop and Mobile HTML 5 game framework
+- [Tiled](https://www.mapeditor.org/): A flexible tile based map editor
+- [Typescript](https://www.typescriptlang.org/)
 
 ## Authors
 
