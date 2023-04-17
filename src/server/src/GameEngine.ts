@@ -29,7 +29,7 @@ export class GameEngine {
   init() {
     // Add some boundary in our world
     Matter.Composite.add(this.world, [
-      Bodies.rectangle(400, 600, 800, 50, { isStatic: true }),
+      Bodies.rectangle(400, 600, 800, 142, { isStatic: true }),
     ]);
 
     this.initUpdateEvents();
