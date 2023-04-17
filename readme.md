@@ -46,5 +46,5 @@ Launch the game client in the browser on localhost, port 8000
 
 ## Authors
 
-[Jevan Malaviya](https://github.com/jevan-malaviya)
-[Habana Barroso](https://github.com/BudZig)
+- [Jevan Malaviya](https://github.com/jevan-malaviya)
+- [Habana Barroso](https://github.com/BudZig)
